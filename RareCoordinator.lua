@@ -25,7 +25,7 @@ local RareNames = {
 	"Al'tabim the All-Seeing",
 	"Backbreaker Uru",
 	"Lu-Ban",
-	"Molthor"
+	"Molthor",
 	--"Elvador",
 	--"Luminescent Crawler"
 }
@@ -33,6 +33,7 @@ local RareSeen = {}
 local RareKilled = {}
 local RareAlive = {}
 local LastSent = {}
+local SoundPlayed = 0
 
 local txt = ""
 
@@ -53,7 +54,7 @@ RC.texture:SetAllPoints(RC)
 
 
 RC.content = RC:CreateFontString("content", nil, "GameFontNormal")
-RC.content:SetTextColor(1,0,0)
+RC.content:SetTextColor(1,1,1)
 RC.content:SetPoint("LEFT", "RC")
 RC.content:SetJustifyH("RIGHT")
 RC.content:SetSpacing(2)
@@ -352,7 +353,11 @@ function RC:updateText()
 			end
 		end
 		if alive then
-			txt = txt .. " " .. name .. " -            ~~~ is ALIVE ~~~             \n"
+			if time() > SoundPlayed + 60 then
+				PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
+				SoundPlayed = time()
+			end
+			txt = txt .. " " .. name .. " -|cff00ff00            ~~~ is ALIVE ~~~             |r\n"
 		elseif gotATime or gotAKill then
 			if gotAKill and gotATime then
 				txt = txt .. " " .. name .. " - seen: ".. date("%X", timeSeen) .." - killed: ".. date("%X", timeKilled) .."  \n"
