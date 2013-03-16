@@ -252,7 +252,6 @@ function RC:ChanRosterUpdate(id)
 	end
 end
 
-
 function RC:getChanID(...)
 	local gotID = false
 	for i = 1, select("#", ...), 2 do
