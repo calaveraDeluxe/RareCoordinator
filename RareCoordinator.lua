@@ -435,7 +435,7 @@ SlashCmdList["RARECOORDINATOR"] = SlashHandler;
 RC:SetScript("OnEvent", RC.OnEvent)
 
 --ONLY FOR TESTING
-		RC:SetScript("OnUpdate", RC.join)
+--		RC:SetScript("OnUpdate", RC.join)
 		
 		
 RC:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
