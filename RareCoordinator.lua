@@ -188,6 +188,7 @@ function RC:AddonMsg(prefix, message, channel, sender)
 					message = string.sub(message, thirdSeperator+1)
 				end
 				
+				
 				for _,v in pairs(RareNames) do
 					if v == eventRareName and eventType ~= nil and eventTime ~= nil then
 							if eventType == "alive" then
