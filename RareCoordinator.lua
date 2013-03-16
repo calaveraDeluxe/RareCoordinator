@@ -10,7 +10,6 @@ local function onDragStop(self)
 end
 
 
-
 --------------------------------
 
 local locked = true
