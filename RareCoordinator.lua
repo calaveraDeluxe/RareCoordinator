@@ -25,7 +25,7 @@ local RareNames = {
 	"Al'tabim the All-Seeing",
 	"Backbreaker Uru",
 	"Lu-Ban",
-	"Molthor"
+	"Molthor",
 	--"Elvador",
 	--"Luminescent Crawler"
 }
@@ -53,7 +53,7 @@ RC.texture:SetAllPoints(RC)
 
 
 RC.content = RC:CreateFontString("content", nil, "GameFontNormal")
-RC.content:SetTextColor(1,0,0)
+RC.content:SetTextColor(1,1,1)
 RC.content:SetPoint("LEFT", "RC")
 RC.content:SetJustifyH("RIGHT")
 RC.content:SetSpacing(2)
@@ -352,7 +352,7 @@ function RC:updateText()
 			end
 		end
 		if alive then
-			txt = txt .. " " .. name .. " -            ~~~ is ALIVE ~~~             \n"
+			txt = txt .. " " .. name .. " -|cff00ff00            ~~~ is ALIVE ~~~             |r\n"
 		elseif gotATime or gotAKill then
 			if gotAKill and gotATime then
 				txt = txt .. " " .. name .. " - seen: ".. date("%X", timeSeen) .." - killed: ".. date("%X", timeKilled) .."  \n"
