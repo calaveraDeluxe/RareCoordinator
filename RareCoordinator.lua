@@ -351,13 +351,10 @@ function RC:updateText()
 			end
 		end
 		if alive then
-<<<<<<< HEAD
 			if time() > SoundPlayed + 60 then
 				PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
 				SoundPlayed = time()
 			end
-=======
->>>>>>> 2b77e3ff13162d334ad1335cca53b488e5ab7e0b
 			txt = txt .. " " .. name .. " -|cff00ff00            ~~~ is ALIVE ~~~             |r\n"
 		elseif gotATime or gotAKill then
 			if gotAKill and gotATime then
