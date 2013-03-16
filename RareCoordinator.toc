@@ -1,0 +1,7 @@
+## Interface: 50200
+## Title: RareCoordinator
+## Notes: Synces the rare mob kill timers across the realm
+## Author: Elvador
+## DefaultState: Enabled
+## SavedVariables: RCDB
+RareCoordinator.lua
