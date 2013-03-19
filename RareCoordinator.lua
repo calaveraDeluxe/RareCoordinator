@@ -24,6 +24,7 @@ local RareNames = {
 	"Backbreaker Uru",
 	"Lu-Ban",
 	"Molthor",
+	"Ra'sha"
 	--"Elvador",
 	--"Luminescent Crawler"
 }
@@ -31,6 +32,7 @@ local RareSeen = {}
 local RareKilled = {}
 local RareAlive = {}
 local LastSent = {}
+
 local SoundPlayed = 0
 
 local txt = ""
@@ -95,7 +97,8 @@ end
 
 
 function RC:ShowOrHide(...)
-	if GetZoneText() == "Isle of Thunder" then
+	local zone = GetZoneText()
+	if zone == "Isle of Thunder" or zone == "Insel des Donners" or zone == "Isla del Trueno" or zone == "Île du Tonnerre" or zone == "Ilha do Trovão" or zone == "Остров Грома" then
 		self:Show()
 		self:SetScript("OnUpdate", RC.join)
 	else
