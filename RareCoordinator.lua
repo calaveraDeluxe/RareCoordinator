@@ -9,6 +9,86 @@ local function onDragStop(self)
 	RCDB.y = self:GetTop()
 end
 
+local function OnDragHandleMouseDown(self) self.frame:StartSizing("BOTTOMRIGHT") end
+
+local function OnDragHandleMouseUp(self, button) self.frame:StopMovingOrSizing() end
+
+local function onResize(self, width, height)
+	height = width/3*2
+	RCDB.width = width
+	RCDB.height = height
+	self:SetHeight(height)
+	
+	local scale = width/300
+	
+	
+	if self.left ~= nil then 
+		self.left:SetPoint("TOPLEFT", self, 4*scale, -5*scale)
+		self.left:SetHeight(height-9*scale)
+		self.left:SetWidth(width/20*12)
+		if self.left.text ~= nil then
+			local i
+			for i=0,table.getn(self.left.text) do
+				self.left.text[i]:SetPoint("TOP", "RC.left", 2*scale, (-2 + -15.4*i)*scale)
+				if i == 0 then
+					self.left.text[i]:SetFont("Fonts\\ARIALN.TTF",12*scale,"OUTLINE")
+				else
+					self.left.text[i]:SetFont("Fonts\\ARIALN.TTF",12*scale)
+				end
+			end
+		end
+		if self.left.icon ~= nil then
+			local i
+			for i=0,table.getn(self.left.icon) do
+				if i == 0 then
+					self.left.icon[i]:SetPoint("TOPRIGHT", "RC.left", 6*scale, -3*scale)
+					self.left.icon[i]:SetWidth(20*scale)
+					self.left.icon[i]:SetHeight(20*scale)
+				else
+					self.left.icon[i]:SetPoint("TOPRIGHT", "RC.left", -3*scale, (-2 + -15.5*i)*scale)
+					self.left.icon[i]:SetWidth(10*scale)
+					self.left.icon[i]:SetHeight(10*scale)
+				end
+			end
+		end
+		
+	end
+	if self.mid ~= nil then
+		self.mid:SetHeight(height-9*scale)
+		self.mid:SetWidth(width/20*4-6*scale)
+		self.mid:SetPoint("TOPLEFT", self.left, "TOPRIGHT", 2*scale, 0)
+		if self.mid.text ~= nil then
+			local i
+			for i=0,table.getn(self.mid.text) do
+				self.mid.text[i]:SetPoint("TOP", "RC.mid", 2*scale, (-2 + -15.4*i)*scale)
+				if i == 0 then
+					self.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12*scale,"OUTLINE")
+				else
+					self.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12*scale)
+				end
+			end
+		end
+	end
+	if self.right ~= nil then 
+		self.right:SetHeight(height-9*scale) 
+		self.right:SetWidth(width/20*4-6*scale)
+		self.right:SetPoint("TOPLEFT", self.mid, "TOPRIGHT", 2*scale, 0)
+		if self.right.text ~= nil then
+			local i
+			for i=0,table.getn(self.right.text) do
+				self.right.text[i]:SetPoint("TOP", "RC.right", 2*scale, (-2 + -15.4*i)*scale)
+				if i == 0 then
+					self.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12*scale,"OUTLINE")
+				else
+					self.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12*scale)
+				end
+			end
+		end
+	end
+	
+end
+
+
 --------------------------------
 
 local locked = true
@@ -95,25 +175,204 @@ local needStatus = false
 local RC = CreateFrame("Frame", "RC", UIParent)
 RC.version = "5.2.0-6"
 
+
+function RC:getLocalRareName(id)
+	if RareNamesLocalized[GetLocale()] ~= nil then
+		if RareNamesLocalized[GetLocale()][id] ~= nil then
+			return RareNamesLocalized[GetLocale()][id]
+		end
+	end
+	if RareNamesLocalized['enUS'][id] ~= nil then
+		return RareNamesLocalized['enUS'][id]
+	else
+		return "Unkown Name"
+	end
+end
+
+RC:SetWidth(300)
+RC:SetHeight(200)
 RC:SetFrameStrata("BACKGROUND")
-RC:SetWidth(415) 
-RC:SetHeight(table.getn(RareIDs)*15) 
 RC:SetPoint("CENTER",0,0)
+RC:SetClampedToScreen(true)
+RC:SetMinResize(150, 0)
+RC:SetMaxResize(500, 0)
 
 RC.texture = RC:CreateTexture(nil,"BACKGROUND")
 RC.texture:SetTexture(0,0,0,0.4)
 RC.texture:SetAllPoints(RC)
 
 
-RC.content = RC:CreateFontString("content", nil, "GameFontNormal")
-RC.content:SetTextColor(1,1,1)
-RC.content:SetPoint("LEFT", "RC")
-RC.content:SetJustifyH("RIGHT")
-RC.content:SetSpacing(2)
+RC.left = CreateFrame("Frame", "RC.left", RC)
+RC.left:SetWidth(200)
+RC.left:SetHeight(RC:GetHeight()-9)
+RC.left:SetPoint("TOPLEFT", RC, 5, -5)
+RC.left.texture = RC:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.left.texture:SetTexture(0,0,0,0.2)
+RC.left.texture:SetAllPoints(RC.left)
+
+RC.mid = CreateFrame("Frame", "RC.mid", RC)
+RC.mid:SetWidth(80)
+RC.mid:SetHeight(RC:GetHeight()-9)
+RC.mid:SetPoint("TOPLEFT", RC.left, "TOPRIGHT", 2, 0)
+RC.mid.texture = RC:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.mid.texture:SetTexture(0,0,0,0.2)
+RC.mid.texture:SetAllPoints(RC.mid)
+
+RC.right = CreateFrame("Frame", "RC.right", RC)
+RC.right:SetWidth(80)
+RC.right:SetHeight(RC:GetHeight()-9)
+RC.right:SetPoint("TOPLEFT", RC.mid, "TOPRIGHT", 2, 0)
+RC.right.texture = RC:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.right.texture:SetTexture(0,0,0,0.2)
+RC.right.texture:SetAllPoints(RC.right)
+
+
+RC.res = CreateFrame("Frame", "RC.res", RC)
+RC.res.frame = RC
+RC.res:SetWidth(16)
+RC.res:SetHeight(16)
+RC.res:SetPoint("BOTTOMRIGHT", RC, -1, 1)
+RC.res:EnableMouse(true)
+RC.res:SetScript("OnMouseDown", OnDragHandleMouseDown)
+RC.res:SetScript("OnMouseUp", OnDragHandleMouseUp)
+RC.res:SetAlpha(0.5)
+
+RC.res.texture = RC.res:CreateTexture(nil, "OVERLAY")
+RC.res.texture:SetTexture([[Interface\AddOns\RareCoordinator\resize.tga]])
+RC.res.texture:SetWidth(16)
+RC.res.texture:SetHeight(16)
+RC.res.texture:SetBlendMode("ADD")
+RC.res.texture:SetPoint("CENTER", RC.res)
+
+RC.res:Hide()
+
+
+RC.left.text = {}
+local i
+for i=0, 11 do
+	RC.left.text[i] = RC.left:CreateFontString("RC.left.text["..i.."]", nil, "GameFontNormal")
+	RC.left.text[i]:SetPoint("TOP", "RC.left", 2, -2 + -14.5*i)
+	RC.left.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
+	RC.left.text[i]:SetTextColor(1,1,1)
+	if i == 0 then
+		RC.left.text[i]:SetText("Rare")
+		RC.left.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
+	else
+		RC.left.text[i]:SetText(RC:getLocalRareName(RareIDs[i]))
+	end
+end
+RC.left.icon = {}
+local i
+for i=0, 11 do
+	RC.left.icon[i] = CreateFrame("Frame", "RC.left.icon["..i.."]", RC)
+
+	if i == 0 then
+		RC.left.icon[i]:SetPoint("TOPRIGHT", "RC.left", 6, -5)
+		RC.left.icon[i]:SetWidth(20)
+		RC.left.icon[i]:SetHeight(20)
+		RC.left.icon[i].texture = RC.left.icon[i]:CreateTexture(nil, "OVERLAY")
+		RC.left.icon[i].texture:SetTexture([[Interface\ACHIEVEMENTFRAME\UI-Achievement-TinyShield]])
+		RC.left.icon[i].texture:SetAllPoints(RC.left.icon[i])
+	else
+		RC.left.icon[i]:SetPoint("TOPRIGHT", "RC.left", -3, -3 + -14.8*i)
+		RC.left.icon[i]:SetWidth(10)
+		RC.left.icon[i]:SetHeight(10)
+		RC.left.icon[i].texture = RC.left.icon[i]:CreateTexture(nil, "OVERLAY")
+		RC.left.icon[i].texture:SetAllPoints(RC.left.icon[i])
+	end
+end
+RC.mid.text = {}
+local i
+for i=0, 11 do
+	RC.mid.text[i] = RC.mid:CreateFontString("RC.mid.text["..i.."]", nil, "GameFontNormal")
+	RC.mid.text[i]:SetPoint("TOP", "RC.mid", 2, -2 + -14.5*i)
+	RC.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
+	RC.mid.text[i]:SetTextColor(1,1,1)
+	if i == 0 then
+		RC.mid.text[i]:SetText("Seen")
+		RC.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
+	end
+end
+RC.right.text = {}
+local i
+for i=0, 11 do
+	RC.right.text[i] = RC.right:CreateFontString("RC.right.text["..i.."]", nil, "GameFontNormal")
+	RC.right.text[i]:SetPoint("TOP", "RC.right", 2, -2 + -14.5*i)
+	RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
+	RC.right.text[i]:SetTextColor(1,1,1)
+	if i == 0 then
+		RC.right.text[i]:SetText("Killed")
+		RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
+	end
+end
+
+local total = 0
+local function updateText(self,elapsed)
+	if elapsed == nil then elapsed = 0 end
+    total = total + elapsed
+    if total >= 10 then
+		for i=1,GetAchievementNumCriteria(8103) do
+			_, _, completed, _, _, _, _, assetID, _, _ = GetAchievementCriteriaInfo(8103,i)
+			if completed then
+				RareAv[assetID] = true
+			else
+				RareAv[assetID] = false
+			end		
+		end
+		if RC.left ~= nil then
+			if RC.left.icon ~= nil then
+				local i
+				for i=1,table.getn(RC.left.icon) do
+					if RareAv[RareIDs[i]] ~= nil then
+						if RareAv[RareIDs[i]] then
+							RC.left.icon[i].texture:SetTexture([[Interface\AddOns\RareCoordinator\green.tga]])
+						else
+							RC.left.icon[i].texture:SetTexture([[Interface\AddOns\RareCoordinator\red.tga]])
+						end
+					end
+				end
+			end
+		end
+		if RC.mid ~= nil then
+			if RC.mid.text ~= nil then
+				local i
+				for i=1,table.getn(RC.mid.text) do
+					if RareAlive[RareIDs[i]] ~= nil then
+						if time() > SoundPlayed + 60 then
+							PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
+							SoundPlayed = time()
+						end
+						RC.mid.text[i]:SetText("|cff00ff00- ALIVE -|r")
+					elseif RareSeen[RareIDs[i]] ~= nil then
+						RC.mid.text[i]:SetText(math.floor((time()-RareSeen[RareIDs[i]])/60).."m ago")
+					else
+						RC.mid.text[i]:SetText("never")
+					end
+				end
+			end
+		end
+		if RC.right ~= nil then
+			if RC.right.text ~= nil then
+				local i
+				for i=1,table.getn(RC.right.text) do
+					if RareKilled[RareIDs[i]] ~= nil then
+						RC.right.text[i]:SetText(date("%X", RareKilled[RareIDs[i]]))
+					else
+						RC.right.text[i]:SetText("never")
+					end
+				end
+			end
+		end
+        total = 0
+    end
+end
+
+
+
 
 function RC:OnEvent(event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		self:CombatLog(...);
+		self:CombatLog(...)
 	end
 	if event == "PLAYER_TARGET_CHANGED" then
 		self:Target(...)
@@ -205,7 +464,7 @@ function RC:Chat(message, sender, language, channelString, target, flags, unknow
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						end
-						self:updateText()
+						updateText()
 						self:CompareVersion(eventVersion)
 						break
 					end
@@ -267,7 +526,7 @@ function RC:AddonMsg(prefix, message, channel, sender)
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						end
-						self:updateText()
+						updateText()
 						self:CompareVersion(eventVersion)
 						break
 					end
@@ -326,7 +585,7 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_killed_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					RareAlive[v] = nil
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_dead_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
-					self:updateText()
+					updateText()
 				break
 			end
 		end
@@ -350,7 +609,7 @@ function RC:ChanRosterUpdate(id)
 				if owner then
 					--print(name .." is the owner right now")
 					SendAddonMessage("RCELVA", "GetStatus", "WHISPER", name)
-					self:updateText()
+					updateText()
 				end
 			end
 		end
@@ -427,74 +686,11 @@ function RC:Target(...)
 						end
 					end
 					--self:DebugMsg(msg)
-					self:updateText()
+					updateText()
 				break
 			end
 		end
 	end
-end
-
-function RC:updateText()
-	local i
-	RareAv = {}
-	for i=1,GetAchievementNumCriteria(8103) do
-		_, _, completed, _, _, _, _, assetID, _, _ = GetAchievementCriteriaInfo(8103,i)
-		if completed then
-			RareAv[assetID] = "|cff00ff00"
-		else
-			RareAv[assetID] = "|cffff0000"
-		end		
-	end
-	txt = ""
-	for _,id in pairs(RareIDs) do
-		gotATime = false
-		gotAKill = false
-		alive = false
-		timeSeen = 0;
-		timeKilled = 0;
-		for timedID,timestamp in pairs(RareSeen) do
-			if id == timedID then
-				timeSeen = timestamp
-				gotATime = true
-			end
-		end
-		for timedID,timestamp in pairs(RareKilled) do
-			if id == timedID then
-				timeKilled = timestamp
-				gotAKill = true
-			end
-		end
-		for timedID,timestamp in pairs(RareAlive) do
-			if id == timedID then
-				alive = true
-			end
-		end
-		if RareAv[id] ~= nil then
-			avtxt = RareAv[id].."av|r"
-		else
-			avtxt = "   "
-		end
-		if alive then
-			if time() > SoundPlayed + 60 then
-				PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
-				SoundPlayed = time()
-			end
-			txt = txt .. " " .. self:getLocalRareName(id) .. " - "..avtxt.." -|cff00ff00            ~~~ is ALIVE ~~~             |r\n"
-		elseif gotATime or gotAKill then
-			if gotAKill and gotATime then
-				txt = txt .. " " .. self:getLocalRareName(id) .. " - "..avtxt.." - seen: ".. date("%X", timeSeen) .." - killed: ".. date("%X", timeKilled) .."  \n"
-			end
-			if gotAKill and not gotATime then
-				txt = txt .. " " .. self:getLocalRareName(id) .. " - "..avtxt.." - seen: not seen - killed: ".. date("%X", timeKilled) .."  \n"
-			end
-			if not gotAKill and gotATime then
-				txt = txt .. " " .. self:getLocalRareName(id) .. " - "..avtxt.." - seen: ".. date("%X", timeSeen) .." - killed: not killed\n"
-			end
-		else
-			txt = txt .. " " .. self:getLocalRareName(id) .. " - "..avtxt.." - seen: not seen - killed: not killed\n"
-		end
-	end
-	self.content:SetText(txt)
 end
 
 local waittime = 0
@@ -527,18 +723,6 @@ function RC.join(self, elapsed)
   end
 end
 
-function RC:getLocalRareName(id)
-	if RareNamesLocalized[GetLocale()] ~= nil then
-		if RareNamesLocalized[GetLocale()][id] ~= nil then
-			return RareNamesLocalized[GetLocale()][id]
-		end
-	end
-	if RareNamesLocalized['enUS'][id] ~= nil then
-		return RareNamesLocalized['enUS'][id]
-	else
-		return "Unkown Name"
-	end
-end
 
 
 function RC:DebugMsg(msg)
@@ -551,29 +735,41 @@ local function SlashHandler(msg, editbox)
 	--print("Usage")
 	if locked then
 		print("RareCoordinator is now unlocked. - Type /rc to lock it")
-		RC:SetMovable(true)
+		
 		RC:EnableMouse(true)
-		RC:RegisterForDrag("LeftButton")
+		RC:SetMovable(true)
+		RC:SetResizable(true)
+		RC:SetScript("OnSizeChanged", onResize)
 		RC:SetScript("OnDragStart", onDragStart)
 		RC:SetScript("OnDragStop", onDragStop)
-		RC:SetScript("OnHide", RC.StopMovingOrSizing)
+		RC:RegisterForDrag("LeftButton")
 		RC:Show()
+		RC.res:Show()
+		
 		locked = false
 	else
-		print("RareCoordinator is now locked. - Type /rc to unlock it")		
+		print("RareCoordinator is now locked. - Type /rc to unlock it")	
+		
 		RC:SetMovable(false)
 		RC:EnableMouse(false)
+		RC:SetResizable(false)
 		RC:RegisterForDrag()
 		RC:SetScript("OnDragStart", nil)
 		RC:SetScript("OnDragStop", nil)
 		RC:SetScript("OnHide", nil)
 		RC:ShowOrHide()
+		RC.res:Hide()
+		
 		locked = true
 	end
 end
 SlashCmdList["RARECOORDINATOR"] = SlashHandler;
 
+RC.updater = CreateFrame("Frame", "RC.updater", RC)
+RC.updater:SetScript("OnUpdate", updateText)
+
 RC:SetScript("OnEvent", RC.OnEvent)
+
 
 --ONLY FOR TESTING
 --		RC:SetScript("OnUpdate", RC.join)
@@ -587,5 +783,6 @@ RC:RegisterEvent("CHAT_MSG_ADDON")
 RC:RegisterEvent("PLAYER_ENTERING_WORLD")
 RC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 RC:RegisterEvent("CHANNEL_ROSTER_UPDATE")
-RC:updateText()
+updateText()
+onResize(RC, RC:GetWidth(), 0)
 RC:Show()
