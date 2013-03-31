@@ -177,7 +177,30 @@ RareNamesLocalized['frFR'][70001] = "Backbreaker Uru" -- need translation
 RareNamesLocalized['frFR'][70002] = "Lu-Ban" -- need translation
 RareNamesLocalized['frFR'][70003] = "Molthor" -- need translation
 RareNamesLocalized['frFR'][70530] = "Ra'sha" -- need translation
-
+RareNamesLocalized['zhTW'] = {}
+RareNamesLocalized['zhTW'][50358] = "故障的奪日者傀儡"
+RareNamesLocalized['zhTW'][69664] = "孟塔"
+RareNamesLocalized['zhTW'][69996] = "『天爪』庫賴"
+RareNamesLocalized['zhTW'][69997] = "普羅堅尼斯"
+RareNamesLocalized['zhTW'][69998] = "戈達"
+RareNamesLocalized['zhTW'][69999] = "弒神巨人拉穆克"
+RareNamesLocalized['zhTW'][70000] = "『全知者』阿塔比姆"
+RareNamesLocalized['zhTW'][70001] = "斷脊者兀魯"
+RareNamesLocalized['zhTW'][70002] = "魯班"
+RareNamesLocalized['zhTW'][70003] = "莫托爾"
+RareNamesLocalized['zhTW'][70530] = "拉沙"
+RareNamesLocalized['zhCN'] = {}
+RareNamesLocalized['zhCN'][50358] = "错乱的夺日者构造体"
+RareNamesLocalized['zhCN'][69664] = "穆塔"
+RareNamesLocalized['zhCN'][69996] = "攫天者库莱"
+RareNamesLocalized['zhCN'][69997] = "布根尼图斯"
+RareNamesLocalized['zhCN'][69998] = "苟达"
+RareNamesLocalized['zhCN'][69999] = "巨灵神拉姆克"
+RareNamesLocalized['zhCN'][70000] = "全知者阿塔比姆"
+RareNamesLocalized['zhCN'][70001] = "碎脊者乌鲁"
+RareNamesLocalized['zhCN'][70002] = "路班"
+RareNamesLocalized['zhCN'][70003] = "莫托尔"
+RareNamesLocalized['zhCN'][70530] = "拉沙"
 
 local RareSeen = {}
 local RareKilled = {}
@@ -464,7 +487,7 @@ end
 
 function RC:ShowOrHide(...)
 	local zone = GetZoneText()
-	if zone == "Isle of Thunder" or zone == "Insel des Donners" or zone == "Isla del Trueno" or zone == "Île du Tonnerre" or zone == "Ilha do Trovão" or zone == "Остров Грома" then
+	if GetCurrentMapAreaID() == 928 then
 		RareAlive = {}
 		self:Show()
 		self:SetScript("OnUpdate", RC.join)
