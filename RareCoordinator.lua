@@ -68,6 +68,16 @@ local function onResize(self, width, height)
 				end
 			end
 		end
+		if self.mid.button ~= nil then
+			local i
+			for i=0,table.getn(self.mid.button) do
+				self.mid.button[i]:SetPoint("TOPLEFT", "RC.mid", 0, -2-(15.5*i)*scale)
+				self.mid.button[i]:SetHeight(13*scale)
+				self.mid.button[i]:SetWidth(self.mid:GetWidth())
+				self.mid.button[i].icon:SetWidth(10*scale)
+				self.mid.button[i].icon:SetHeight(10*scale)
+			end
+		end
 	end
 	if self.right ~= nil then 
 		self.right:SetHeight(height-9*scale) 
@@ -85,9 +95,7 @@ local function onResize(self, width, height)
 			end
 		end
 	end
-	
 end
-
 
 --------------------------------
 
@@ -105,6 +113,19 @@ local RareIDs = {
 	70003, -- Molthor
 	70530, -- Ra'sha
 	--69384  -- Luminescent Crawler - FOR TESTING ONLY
+}
+local RareCoords = {
+	"~48/88", -- Haywire Sunreaver Construct
+	"35/63 (on top)", -- Mumta
+	"~38/83", -- Ku'lai Skyclaw
+	"51/71 (on top)", -- Progenitus
+	"54/53", -- Goda
+	"62/50", -- God-Hulk Ramuk
+	"45/30", -- Al'tabim the All-Seeing
+	"~48/25 (in the mine)", -- Backbreaker Uru
+	"54/36", -- Lu-Ban
+	"59/36", -- Molthor
+	"39/81", -- Ra'sha
 }
 local RareNamesLocalized = {};
 RareNamesLocalized['enUS'] = {}
@@ -163,8 +184,9 @@ local RareKilled = {}
 local RareAlive = {}
 local LastSent = {}
 local RareAv = {}
+local SoundPlayed = {}
 
-local SoundPlayed = 0
+--local SoundPlayed = 0
 local VersionNotify = false
 
 local txt = ""
@@ -188,6 +210,12 @@ function RC:getLocalRareName(id)
 		return "Unkown Name"
 	end
 end
+
+
+local function OnMouseDownAnnounce(id)
+	SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(RareIDs[id])..": "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
+end
+
 
 RC:SetWidth(300)
 RC:SetHeight(200)
@@ -225,7 +253,6 @@ RC.right:SetPoint("TOPLEFT", RC.mid, "TOPRIGHT", 2, 0)
 RC.right.texture = RC:CreateTexture(nil,"BACKGROUND", nil, 1)
 RC.right.texture:SetTexture(0,0,0,0.2)
 RC.right.texture:SetAllPoints(RC.right)
-
 
 RC.res = CreateFrame("Frame", "RC.res", RC)
 RC.res.frame = RC
@@ -280,6 +307,28 @@ for i=0, 11 do
 		RC.left.icon[i].texture = RC.left.icon[i]:CreateTexture(nil, "OVERLAY")
 		RC.left.icon[i].texture:SetAllPoints(RC.left.icon[i])
 	end
+end
+RC.mid.button = {}
+for i=0, 11 do
+	RC.mid.button[i] = CreateFrame("Frame", "RC.mid.button["..i.."]", RC)
+	RC.mid.button[i]:SetPoint("TOPLEFT", "RC.mid", 0, -2 + -14.5*i)
+	RC.mid.button[i]:SetHeight(13)
+	RC.mid.button[i]:SetWidth(RC.mid:GetWidth())
+	RC.mid.button[i].texture = RC.mid.button[i]:CreateTexture(nil,"BACKGROUND", nil, 2)
+	RC.mid.button[i].texture:SetTexture(0,0.5,0,0.4)
+	RC.mid.button[i].texture:SetAllPoints(RC.mid.button[i])
+	
+	RC.mid.button[i].icon = CreateFrame("Frame", "RC.mid.icon["..i.."].icon", RC.mid.button[i])
+	RC.mid.button[i].icon:SetPoint("RIGHT", "RC.mid.button["..i.."]", 2, 0)
+	RC.mid.button[i].icon:SetWidth(10)
+	RC.mid.button[i].icon:SetHeight(10)
+	RC.mid.button[i].icon.texture = RC.mid.button[i].icon:CreateTexture(nil, "OVERLAY")
+	RC.mid.button[i].icon.texture:SetTexture([[Interface\AddOns\RareCoordinator\announce.tga]])
+	RC.mid.button[i].icon.texture:SetAllPoints(RC.mid.button[i].icon)
+	if i ~= 0 then
+		RC.mid.button[i]:SetScript("OnMouseDown", function (self) OnMouseDownAnnounce(i) end)
+	end
+	RC.mid.button[i]:Hide()
 end
 RC.mid.text = {}
 local i
@@ -338,14 +387,20 @@ local function updateText(self,elapsed)
 				local i
 				for i=1,table.getn(RC.mid.text) do
 					if RareAlive[RareIDs[i]] ~= nil then
-						if time() > SoundPlayed + 60 then
+						if SoundPlayed[RareIDs[i]] == nil then
 							PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
-							SoundPlayed = time()
+							SoundPlayed[RareIDs[i]] = time()
+						elseif time() > SoundPlayed[RareIDs[i]] + 600 then
+							PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
+							SoundPlayed[RareIDs[i]] = time()
 						end
-						RC.mid.text[i]:SetText("|cff00ff00- ALIVE -|r")
+						RC.mid.button[i]:Show()
+						RC.mid.text[i]:SetText("|cff00ff00ALIVE|r")
 					elseif RareSeen[RareIDs[i]] ~= nil then
+						RC.mid.button[i]:Hide()
 						RC.mid.text[i]:SetText(math.floor((time()-RareSeen[RareIDs[i]])/60).."m ago")
 					else
+						RC.mid.button[i]:Hide()
 						RC.mid.text[i]:SetText("never")
 					end
 				end
@@ -464,7 +519,7 @@ function RC:Chat(message, sender, language, channelString, target, flags, unknow
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						end
-						updateText()
+						updateText(self, 100)
 						self:CompareVersion(eventVersion)
 						break
 					end
@@ -526,7 +581,7 @@ function RC:AddonMsg(prefix, message, channel, sender)
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						end
-						updateText()
+						updateText(self, 100)
 						self:CompareVersion(eventVersion)
 						break
 					end
@@ -585,7 +640,7 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_killed_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					RareAlive[v] = nil
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_dead_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
-					updateText()
+					updateText(self, 100)
 				break
 			end
 		end
@@ -609,7 +664,7 @@ function RC:ChanRosterUpdate(id)
 				if owner then
 					--print(name .." is the owner right now")
 					SendAddonMessage("RCELVA", "GetStatus", "WHISPER", name)
-					updateText()
+					updateText(self, 100)
 				end
 			end
 		end
@@ -686,7 +741,7 @@ function RC:Target(...)
 						end
 					end
 					--self:DebugMsg(msg)
-					updateText()
+					updateText(self, 100)
 				break
 			end
 		end
@@ -783,6 +838,6 @@ RC:RegisterEvent("CHAT_MSG_ADDON")
 RC:RegisterEvent("PLAYER_ENTERING_WORLD")
 RC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 RC:RegisterEvent("CHANNEL_ROSTER_UPDATE")
-updateText()
+updateText(RC, 100)
 onResize(RC, RC:GetWidth(), 0)
 RC:Show()
