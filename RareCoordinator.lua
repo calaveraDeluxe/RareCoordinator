@@ -218,7 +218,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.2.0-8"
+RC.version = "5.2.0-9"
 
 
 function RC:getLocalRareName(id)
