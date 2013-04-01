@@ -205,12 +205,15 @@ RareNamesLocalized['zhCN'][70530] = "拉沙"
 local RareSeen = {}
 local RareKilled = {}
 local RareAlive = {}
+local RareAliveHP = {}
+local RareAnnounced = {}
 local LastSent = {}
 local RareAv = {}
 local SoundPlayed = {}
 
 --local SoundPlayed = 0
 local VersionNotify = false
+local myChan = false
 
 local txt = ""
 
@@ -218,7 +221,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.2.0-9"
+RC.version = "5.2.0-10"
 
 
 function RC:getLocalRareName(id)
@@ -234,9 +237,35 @@ function RC:getLocalRareName(id)
 	end
 end
 
+function RC:getTargetPercentHP()
+	local currhp = UnitHealth("target")
+	local maxhp = UnitHealthMax("target")
+	if currhp == 0 and maxhp == 0 then
+		return false
+	else
+		return math.floor(currhp/maxhp * 100) 
+	end
+end
+
+function RC:getTargetPercentHProunded()
+	local per = self:getTargetPercentHP()
+	if per then
+		return math.floor(per/10)*10
+	else
+		return false
+	end
+end
+
 
 local function OnMouseDownAnnounce(id)
-	SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(RareIDs[id])..": "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
+	if RareAnnounced[RareIDs[id]] == nil then
+		if RareAliveHP[RareIDs[id]] == nil then
+			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(RareIDs[id])..": "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
+		else
+			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(RareIDs[id]).."("..RareAliveHP[RareIDs[id]].."%): "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
+		end
+		RareAnnounced[RareIDs[id]] = time()
+	end
 end
 
 
@@ -418,7 +447,7 @@ local function updateText(self,elapsed)
 							SoundPlayed[RareIDs[i]] = time()
 						end
 						RC.mid.button[i]:Show()
-						RC.mid.text[i]:SetText("|cff00ff00ALIVE|r")
+						RC.mid.text[i]:SetText("|cff00ff00alive|r")
 					elseif RareSeen[RareIDs[i]] ~= nil then
 						RC.mid.button[i]:Hide()
 						RC.mid.text[i]:SetText(math.floor((time()-RareSeen[RareIDs[i]])/60).."m ago")
@@ -433,8 +462,10 @@ local function updateText(self,elapsed)
 			if RC.right.text ~= nil then
 				local i
 				for i=1,table.getn(RC.right.text) do
-					if RareKilled[RareIDs[i]] ~= nil then
-						RC.right.text[i]:SetText(date("%X", RareKilled[RareIDs[i]]))
+					if RareAliveHP[RareIDs[i]] ~= nil then
+						RC.right.text[i]:SetText("|cff00ff00"..RareAliveHP[RareIDs[i]].."%|r")
+					elseif RareKilled[RareIDs[i]] ~= nil then
+						RC.right.text[i]:SetText(math.floor((time()-RareKilled[RareIDs[i]])/60).."m ago")
 					else
 						RC.right.text[i]:SetText("never")
 					end
@@ -470,6 +501,9 @@ function RC:OnEvent(event, ...)
 	if event == "CHANNEL_ROSTER_UPDATE" then
 		self:ChanRosterUpdate(...)
 	end
+	if event == "UNIT_HEALTH" then
+		self:UnitHealth(...)
+	end
 end
 
 function RC:OnLoad(...)
@@ -484,6 +518,31 @@ function RC:OnLoad(...)
 	end
 end
 
+function RC:UnitHealth(unit)
+	if unit ~= "target" then return end
+	if UnitGUID("target") ~= nil then
+		id = tonumber(UnitGUID("target"):sub(6, 10), 16)
+		for _,v in pairs(RareIDs) do
+			if v == id then
+				local per = self:getTargetPercentHProunded()
+				if per and per >= 0 then
+					if RareAliveHP[id] ~= nil then
+						if RareAliveHP[id] > per then
+							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per.."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+							RareAliveHP[id] = per
+							updateText(self, 100)
+						end
+					else
+						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per.."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+						RareAliveHP[id] = per
+						updateText(self, 100)
+					end
+				end
+			end
+		end
+	end
+end
+
 
 function RC:ShowOrHide(...)
 	local zone = GetZoneText()
@@ -491,9 +550,11 @@ function RC:ShowOrHide(...)
 		RareAlive = {}
 		self:Show()
 		self:SetScript("OnUpdate", RC.join)
+		self:RegisterEvent("UNIT_HEALTH")
 	else
 		self:Hide()
 		LeaveChannelByName("RCELVA")
+		self:UnregisterEvent("UNIT_HEALTH")
 	end
 end
 
@@ -535,10 +596,16 @@ function RC:Chat(message, sender, language, channelString, target, flags, unknow
 					if v == eventRareID and eventType ~= nil and eventTime ~= nil then
 						if eventType == "alive" then
 							RareAlive[v] = eventTime
+						elseif string.sub(eventType,0,5) == "alive" then
+							RareAlive[v] = eventTime
+							RareAliveHP[v] = tonumber(string.sub(eventType,6))
 						elseif eventType == "dead" then
 							RareAlive[v] = nil
+							RareAliveHP[v] = nil
 						elseif eventType == "killed" then
 							RareKilled[v] = eventTime
+							RareAlive[v] = nil
+							RareAliveHP[v] = nil
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						end
@@ -599,8 +666,11 @@ function RC:AddonMsg(prefix, message, channel, sender)
 							RareAlive[v] = eventTime
 						elseif eventType == "dead" then
 							RareAlive[v] = nil
+							RareAliveHP[v] = nil
 						elseif eventType == "killed" then
 							RareKilled[v] = eventTime
+							RareAlive[v] = nil
+							RareAliveHP[v] = nil
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						end
@@ -663,6 +733,10 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_killed_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					RareAlive[v] = nil
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_dead_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+					if RareAnnounced[v] then
+						SendChatMessage("{rt8} [RareCoordinator] "..RC:getLocalRareName(npcID).." is now dead {rt8}", "CHANNEL", nil, 1)
+						RareAnnounced[v] = nil
+					end
 					updateText(self, 100)
 				break
 			end
@@ -695,11 +769,15 @@ function RC:ChanRosterUpdate(id)
 end
 
 function RC:getChanID(...)
+	if myChan ~= false then
+		return myChan
+	end
 	local gotID = false
 	for i = 1, select("#", ...), 2 do
 		local id, name = select(i, ...)
 		if name == "RCELVA" then
 			gotID = true
+			myChan = id
 			return id
 		end
 	end
@@ -861,6 +939,7 @@ RC:RegisterEvent("CHAT_MSG_ADDON")
 RC:RegisterEvent("PLAYER_ENTERING_WORLD")
 RC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 RC:RegisterEvent("CHANNEL_ROSTER_UPDATE")
+
 updateText(RC, 100)
 onResize(RC, RC:GetWidth(), 0)
 RC:Show()
