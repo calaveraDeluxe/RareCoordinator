@@ -127,6 +127,19 @@ local RareCoords = {
 	"59/36", -- Molthor
 	"39/81", -- Ra'sha
 }
+local RareCoordsRaw = {
+	{x=48.5, y=88.5}, -- Haywire Sunreaver Construct
+	{x=35.1, y=62.4}, -- Mumta
+	{x=35.9, y=82.1}, -- Ku'lai Skyclaw
+	{x=51.2, y=71.3}, -- Progenitus
+	{x=53.7, y=53.1}, -- Goda
+	{x=61.5, y=49.5}, -- God-Hulk Ramuk
+	{x=44.8, y=30.1}, -- Al'tabim the All-Seeing
+	{x=40.5, y=27.5}, -- Backbreaker Uru
+	{x=54.4, y=35.7}, -- Lu-Ban
+	{x=59, y=36}, -- Molthor
+	{x=39.5, y=81.2}, -- Ra'sha
+}
 local RareNamesLocalized = {};
 RareNamesLocalized['enUS'] = {}
 RareNamesLocalized['enUS'][50358] = "Haywire Sunreaver Construct"
@@ -216,12 +229,15 @@ local VersionNotify = false
 local myChan = false
 
 local txt = ""
+local currentWaypointX = false
+local currentWaypointY = false
+local currentWaypointNPCID = false
 
 local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.2.0-10"
+RC.version = "5.2.0-11"
 
 
 function RC:getLocalRareName(id)
@@ -256,6 +272,16 @@ function RC:getTargetPercentHProunded()
 	end
 end
 
+function RC:setWaypoint(id)
+	if TomTom ~= nil then
+		if currentWaypointX == false and currentWaypointY == false then
+			TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(RareIDs[id]))
+			currentWaypointX = RareCoordsRaw[id]["x"]
+			currentWaypointY = RareCoordsRaw[id]["y"]
+			currentWaypointNPCID = RareIDs[id]
+		end
+	end
+end
 
 local function OnMouseDownAnnounce(id)
 	if RareAnnounced[RareIDs[id]] == nil then
@@ -448,6 +474,7 @@ local function updateText(self,elapsed)
 						end
 						RC.mid.button[i]:Show()
 						RC.mid.text[i]:SetText("|cff00ff00alive|r")
+						RC:setWaypoint(i)
 					elseif RareSeen[RareIDs[i]] ~= nil then
 						RC.mid.button[i]:Hide()
 						RC.mid.text[i]:SetText(math.floor((time()-RareSeen[RareIDs[i]])/60).."m ago")
@@ -508,7 +535,7 @@ end
 
 function RC:OnLoad(...)
 	if select(1, ...) == "RareCoordinator" then
-		print("RareCoordinator loaded - type /rc for options");
+		print("RareCoordinator loaded - type /rc or /rare for options");
 		if RCDB.x == nil or RCDB.y == nil then
 			self:SetPoint("CENTER",0,0)
 		else
@@ -549,6 +576,7 @@ function RC:ShowOrHide(...)
 	if GetCurrentMapAreaID() == 928 then
 		RareAlive = {}
 		self:Show()
+		myChan = false
 		self:SetScript("OnUpdate", RC.join)
 		self:RegisterEvent("UNIT_HEALTH")
 	else
@@ -602,10 +630,22 @@ function RC:Chat(message, sender, language, channelString, target, flags, unknow
 						elseif eventType == "dead" then
 							RareAlive[v] = nil
 							RareAliveHP[v] = nil
+							if currentWaypointNPCID ~= nil then
+								if currentWaypointNPCID == v then
+									currentWaypointX = false
+									currentWaypointY = false
+								end
+							end
 						elseif eventType == "killed" then
 							RareKilled[v] = eventTime
 							RareAlive[v] = nil
 							RareAliveHP[v] = nil
+							if currentWaypointNPCID ~= nil then
+								if currentWaypointNPCID == v then
+									currentWaypointX = false
+									currentWaypointY = false
+								end
+							end
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						end
@@ -737,6 +777,12 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 						SendChatMessage("{rt8} [RareCoordinator] "..RC:getLocalRareName(npcID).." is now dead {rt8}", "CHANNEL", nil, 1)
 						RareAnnounced[v] = nil
 					end
+					if currentWaypointNPCID ~= nil then
+						if currentWaypointNPCID == npcID then
+							currentWaypointX = false
+							currentWaypointY = false
+						end
+					end
 					updateText(self, 100)
 				break
 			end
@@ -829,6 +875,12 @@ function RC:Target(...)
 						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					else
 						RareAlive[v] = nil
+						if currentWaypointNPCID ~= nil then
+							if currentWaypointNPCID == id then
+								currentWaypointX = false
+								currentWaypointY = false
+							end
+						end
 						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_dead_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					end
 					RareSeen[v] = time()
@@ -886,11 +938,13 @@ function RC:DebugMsg(msg)
 		
 end
 
-SLASH_RARECOORDINATOR1 = "/rc"
+SLASH_RARECOORDINATOR1 = "/rare"
+SLASH_RARECOORDINATOR2 = "/rarecoordinator"
+SLASH_RARECOORDINATOR3 = "/rc"
 local function SlashHandler(msg, editbox)
 	--print("Usage")
 	if locked then
-		print("RareCoordinator is now unlocked. - Type /rc to lock it")
+		print("RareCoordinator is now unlocked. - Type /rc or /rare to lock it")
 		
 		RC:EnableMouse(true)
 		RC:SetMovable(true)
@@ -904,7 +958,7 @@ local function SlashHandler(msg, editbox)
 		
 		locked = false
 	else
-		print("RareCoordinator is now locked. - Type /rc to unlock it")	
+		print("RareCoordinator is now locked. - Type /rc or /rare to unlock it")	
 		
 		RC:SetMovable(false)
 		RC:EnableMouse(false)
@@ -939,6 +993,7 @@ RC:RegisterEvent("CHAT_MSG_ADDON")
 RC:RegisterEvent("PLAYER_ENTERING_WORLD")
 RC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 RC:RegisterEvent("CHANNEL_ROSTER_UPDATE")
+
 
 updateText(RC, 100)
 onResize(RC, RC:GetWidth(), 0)
