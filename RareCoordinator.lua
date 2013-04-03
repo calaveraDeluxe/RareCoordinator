@@ -124,7 +124,7 @@ local RareCoords = {
 	"45/30", -- Al'tabim the All-Seeing
 	"~48/25 (in the mine)", -- Backbreaker Uru
 	"54/36", -- Lu-Ban
-	"59/36", -- Molthor
+	"63/49", -- Molthor
 	"39/81", -- Ra'sha
 }
 local RareCoordsRaw = {
@@ -137,7 +137,7 @@ local RareCoordsRaw = {
 	{x=44.8, y=30.1}, -- Al'tabim the All-Seeing
 	{x=40.5, y=27.5}, -- Backbreaker Uru
 	{x=54.4, y=35.7}, -- Lu-Ban
-	{x=59, y=36}, -- Molthor
+	{x=63.4, y=49.3}, -- Molthor
 	{x=39.5, y=81.2}, -- Ra'sha
 }
 local RareNamesLocalized = {};
@@ -237,7 +237,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.2.0-11"
+RC.version = "5.2.0-12"
 
 
 function RC:getLocalRareName(id)
@@ -446,6 +446,22 @@ local function updateText(self,elapsed)
 				RareAv[assetID] = false
 			end		
 		end
+		for k,v in pairs(RareSeen) do
+			if tonumber(v)+2*60*60 < time() then
+				RareSeen[k] = nil
+			end
+		end
+		for k,v in pairs(RareKilled) do
+			if tonumber(v)+2*60*60 < time() then
+				RareKilled[k] = nil
+			end
+		end
+		for k,v in pairs(RareAlive) do
+			if tonumber(v)+10*60 < time() then
+				RareAlive[k] = nil
+				RareAliveHP[k] = nil
+			end
+		end
 		if RC.left ~= nil then
 			if RC.left.icon ~= nil then
 				local i
@@ -489,7 +505,7 @@ local function updateText(self,elapsed)
 			if RC.right.text ~= nil then
 				local i
 				for i=1,table.getn(RC.right.text) do
-					if RareAliveHP[RareIDs[i]] ~= nil then
+					if RareAliveHP[RareIDs[i]] ~= nil and RareAlive[RareIDs[i]] then
 						RC.right.text[i]:SetText("|cff00ff00"..RareAliveHP[RareIDs[i]].."%|r")
 					elseif RareKilled[RareIDs[i]] ~= nil then
 						RC.right.text[i]:SetText(math.floor((time()-RareKilled[RareIDs[i]])/60).."m ago")
@@ -730,19 +746,19 @@ function RC:CompareVersion(v)
 	local newVersion=false
 	local expan1, cpatch1, mpatch1, revision1, expan2, cpatch2, mpatch2, revision2
 	for n in string.gmatch(self.version, "%d+") do
-		if     i == 0 then expan1 = n
-		elseif i == 1 then cpatch1 = n
-		elseif i == 2 then mpatch1 = n
-		elseif i == 3 then revision1 = n
+		if     i == 0 then expan1 = tonumber(n)
+		elseif i == 1 then cpatch1 = tonumber(n)
+		elseif i == 2 then mpatch1 = tonumber(n)
+		elseif i == 3 then revision1 = tonumber(n)
 		end
 		i = i + 1
 	end
 	i=0
 	for n in string.gmatch(v, "%d+") do
-		if     i == 0 then expan2 = n
-		elseif i == 1 then cpatch2 = n
-		elseif i == 2 then mpatch2 = n
-		elseif i == 3 then revision2 = n
+		if     i == 0 then expan2 = tonumber(n)
+		elseif i == 1 then cpatch2 = tonumber(n)
+		elseif i == 2 then mpatch2 = tonumber(n)
+		elseif i == 3 then revision2 = tonumber(n)
 		end
 		i = i + 1
 	end
@@ -772,6 +788,7 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 					--self:DebugMsg(msg)
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_killed_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					RareAlive[v] = nil
+					RareAliveHP[v] = nil
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_dead_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					if RareAnnounced[v] then
 						SendChatMessage("{rt8} [RareCoordinator] "..RC:getLocalRareName(npcID).." is now dead {rt8}", "CHANNEL", nil, 1)
@@ -875,6 +892,7 @@ function RC:Target(...)
 						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					else
 						RareAlive[v] = nil
+						RareAliveHP[v] = nil
 						if currentWaypointNPCID ~= nil then
 							if currentWaypointNPCID == id then
 								currentWaypointX = false
