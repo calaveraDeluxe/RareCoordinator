@@ -1,6 +1,6 @@
-## Interface: 50200
+## Interface: 50400
 ## Title: RareCoordinator
-## Notes: Synces the rare mob kill timers across the realm
+## Notes: Synces the rare mob kill timers on the Timeless Isle across the realm
 ## Author: Elvador
 ## DefaultState: Enabled
 ## SavedVariables: RCDB

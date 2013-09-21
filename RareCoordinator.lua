@@ -14,7 +14,7 @@ local function OnDragHandleMouseDown(self) self.frame:StartSizing("BOTTOMRIGHT")
 local function OnDragHandleMouseUp(self, button) self.frame:StopMovingOrSizing() end
 
 local function onResize(self, width, height)
-	height = width/3*2
+	height = width*1.69
 	RCDB.width = width
 	RCDB.height = height
 	self:SetHeight(height)
@@ -101,119 +101,235 @@ end
 
 local locked = true
 local RareIDs = {
-	50358, -- Haywire Sunreaver Construct
-	69664, -- Mumta
-	69996, -- Ku'lai Skyclaw
-	69997, -- Progenitus
-	69998, -- Goda
-	69999, -- God-Hulk Ramuk
-	70000, -- Al'tabim the All-Seeing
-	70001, -- Backbreaker Uru
-	70002, -- Lu-Ban
-	70003, -- Molthor
-	70530, -- Ra'sha
+	73174, -- Archiereus of Flame
+	72775, -- Bufo
+	73171, -- Champion of the Black Flame
+	72045, -- Chelon
+	73175, -- Cinderfall
+	73854, -- Cranegnasher
+	73281, -- Dread Ship Vazuvius
+	73158, -- Emerald Gander
+	73279, -- Evermaw
+	73172, -- Flintlord Gairan
+	73282, -- Garnia
+	72970, -- Golganarr
+	73161, -- Great Turtle Furyshell
+	72909, -- Gu'chi the Swarmbringer
+	73167, -- Huolon 
+	73163, -- Imperial Python
+	73160, -- Ironfur Steelhorn
+	73169, -- Jakur of Ordon
+	72193, -- Karkanos
+	73277, -- Leafmender
+	73166, -- Monstrous Spineclaw
+	72048, -- Rattleskew
+	73157, -- Rock Moss
+	71864, -- Spelurk
+	72769, -- Spirit of Jadefire
+	73704, -- Stinkbraid 
+	72808, -- Tsavo'ka
+	73173, -- Urdur the Cauterizer
+	73170, -- Watcher Osu
+	72245, -- Zesqua
+	71919 -- Zhu-Gon the Sour
 	--69384  -- Luminescent Crawler - FOR TESTING ONLY
 }
 local RareCoords = {
-	"~48/88", -- Haywire Sunreaver Construct
-	"35/63 (on top)", -- Mumta
-	"~38/83", -- Ku'lai Skyclaw
-	"51/71 (on top)", -- Progenitus
-	"54/53", -- Goda
-	"62/50", -- God-Hulk Ramuk
-	"45/30", -- Al'tabim the All-Seeing
-	"~48/25 (in the mine)", -- Backbreaker Uru
-	"54/36", -- Lu-Ban
-	"63/49", -- Molthor
-	"39/81", -- Ra'sha
+	"varied spawn: either 53.8 / 32.2 or 36.0 / 30.0", -- Archiereus of Flame
+	"around 65.4 / 70.0", -- Bufo
+	"patrols between the 2 big bridges", -- Champion of the Black Flame
+	"25.3 / 35.8", -- Chelon
+	"54.0 / 52.4", -- Cinderfall
+	"44.5 / 69.0", -- Cranegnasher
+	"25.8 / 23.2", -- Dread Ship Vazuvius
+	"varied spawn in the forest", -- Emerald Gander
+	"swims around the isle", -- Evermaw
+	"varied spawn around Ordon Sanctuary", -- Flintlord Gairan
+	"64.8 / 28.8", -- Garnia
+	"62.5 / 63.5", -- Golganarr
+	"varied spawn around west coast", -- Great Turtle Furyshell
+	"varied spawn around Old Pi'jiu village", -- Gu'chi the Swarmbringer
+	"varied spawn flying around the bridges", -- Huolon 
+	"varied spawn around the forests in the center area", -- Imperial Python
+	"varied spawn around the center area", -- Ironfur Steelhorn
+	"52.0 / 83.4", -- Jakur of Ordon
+	"33.9 / 85.1", -- Karkanos
+	"67.3 / 44.1", -- Leafmender
+	"varied spawn around the beach", -- Monstrous Spineclaw
+	"60.6 / 87.2", -- Rattleskew
+	"45.4 / 29.4", -- Rock Moss
+	"59.0 / 48.8", -- Spelurk
+	"45.4 / 38.9", -- Spirit of Jadefire
+	"71.5 / 80.7", -- Stinkbraid 
+	"54.6 / 44.3", -- Tsavo'ka
+	"45.4 / 26.6", -- Urdur the Cauterizer
+	"57.5 / 77.1", -- Watcher Osu
+	"47.6 / 87.3", -- Zesqua
+	"37.4 / 77.4" -- Zhu-Gon the Sour
 }
 local RareCoordsRaw = {
-	{x=48.5, y=88.5}, -- Haywire Sunreaver Construct
-	{x=35.1, y=62.4}, -- Mumta
-	{x=35.9, y=82.1}, -- Ku'lai Skyclaw
-	{x=51.2, y=71.3}, -- Progenitus
-	{x=53.7, y=53.1}, -- Goda
-	{x=61.5, y=49.5}, -- God-Hulk Ramuk
-	{x=44.8, y=30.1}, -- Al'tabim the All-Seeing
-	{x=40.5, y=27.5}, -- Backbreaker Uru
-	{x=54.4, y=35.7}, -- Lu-Ban
-	{x=63.4, y=49.3}, -- Molthor
-	{x=39.5, y=81.2}, -- Ra'sha
+	{x=0, y=0}, -- Archiereus of Flame
+	{x=65.4, y=70.0}, -- Bufo
+	{x=0, y=0}, -- Champion of the Black Flame
+	{x=25.3, y=35.8}, -- Chelon
+	{x=54.0, y=52.4}, -- Cinderfall
+	{x=44.5, y=69.0}, -- Cranegnasher
+	{x=25.8, y=23.2}, -- Dread Ship Vazuvius
+	{x=0, y=0}, -- Emerald Gander
+	{x=0, y=0}, -- Evermaw
+	{x=0, y=0}, -- Flintlord Gairan
+	{x=64.8, y=28.8}, -- Garnia
+	{x=62.5, y=63.5}, -- Golganarr
+	{x=0, y=0}, -- Great Turtle Furyshell
+	{x=0, y=0}, -- Gu'chi the Swarmbringer
+	{x=0, y=0}, -- Huolon 
+	{x=0, y=0}, -- Imperial Python
+	{x=0, y=0}, -- Ironfur Steelhorn
+	{x=52.0, y=83.4}, -- Jakur of Ordon
+	{x=33.9, y=85.1}, -- Karkanos
+	{x=67.3, y=44.1}, -- Leafmender
+	{x=0, y=0}, -- Monstrous Spineclaw
+	{x=60.6, y=87.2}, -- Rattleskew
+	{x=45.4, y=29.4}, -- Rock Moss
+	{x=59.0, y=48.8}, -- Spelurk
+	{x=45.4, y=38.9}, -- Spirit of Jadefire
+	{x=71.5, y=80.7}, -- Stinkbraid 
+	{x=54.6, y=44.3}, -- Tsavo'ka
+	{x=45.4, y=26.6}, -- Urdur the Cauterizer
+	{x=57.5, y=77.1}, -- Watcher Osu
+	{x=47.6, y=87.3}, -- Zesqua
+	{x=37.4, y=77.4} -- Zhu-Gon the Sour
 }
 local RareNamesLocalized = {};
 RareNamesLocalized['enUS'] = {}
-RareNamesLocalized['enUS'][50358] = "Haywire Sunreaver Construct"
-RareNamesLocalized['enUS'][69664] = "Mumta"
-RareNamesLocalized['enUS'][69996] = "Ku'lai the Skyclaw"
-RareNamesLocalized['enUS'][69997] = "Progenitus"
-RareNamesLocalized['enUS'][69998] = "Goda"
-RareNamesLocalized['enUS'][69999] = "God-Hulk Ramuk"
-RareNamesLocalized['enUS'][70000] = "Al'tabim the All-Seeing"
-RareNamesLocalized['enUS'][70001] = "Backbreaker Uru"
-RareNamesLocalized['enUS'][70002] = "Lu-Ban"
-RareNamesLocalized['enUS'][70003] = "Molthor"
-RareNamesLocalized['enUS'][70530] = "Ra'sha"
+RareNamesLocalized['enUS'][73174] = "Archiereus of Flame"
+RareNamesLocalized['enUS'][72775] = "Bufo"
+RareNamesLocalized['enUS'][73171] = "Champion of the Black Flame"
+RareNamesLocalized['enUS'][72045] = "Chelon"
+RareNamesLocalized['enUS'][73175] = "Cinderfall"
+RareNamesLocalized['enUS'][73854] = "Cranegnasher"
+RareNamesLocalized['enUS'][73281] = "Dread Ship Vazuvius"
+RareNamesLocalized['enUS'][73158] = "Emerald Gander"
+RareNamesLocalized['enUS'][73279] = "Evermaw"
+RareNamesLocalized['enUS'][73172] = "Flintlord Gairan"
+RareNamesLocalized['enUS'][73282] = "Garnia"
+RareNamesLocalized['enUS'][72970] = "Golganarr"
+RareNamesLocalized['enUS'][73161] = "Great Turtle Furyshell"
+RareNamesLocalized['enUS'][72909] = "Gu'chi the Swarmbringer"
+RareNamesLocalized['enUS'][73167] = "Huolon "
+RareNamesLocalized['enUS'][73163] = "Imperial Python"
+RareNamesLocalized['enUS'][73160] = "Ironfur Steelhorn"
+RareNamesLocalized['enUS'][73169] = "Jakur of Ordon"
+RareNamesLocalized['enUS'][72193] = "Karkanos"
+RareNamesLocalized['enUS'][73277] = "Leafmender"
+RareNamesLocalized['enUS'][73166] = "Monstrous Spineclaw"
+RareNamesLocalized['enUS'][72048] = "Rattleskew"
+RareNamesLocalized['enUS'][73157] = "Rock Moss"
+RareNamesLocalized['enUS'][71864] = "Spelurk"
+RareNamesLocalized['enUS'][72769] = "Spirit of Jadefire"
+RareNamesLocalized['enUS'][73704] = "Stinkbraid "
+RareNamesLocalized['enUS'][72808] = "Tsavo'ka"
+RareNamesLocalized['enUS'][73173] = "Urdur the Cauterizer"
+RareNamesLocalized['enUS'][73170] = "Watcher Osu"
+RareNamesLocalized['enUS'][72245] = "Zesqua"
+RareNamesLocalized['enUS'][71919] = "Zhu-Gon the Sour"
 --RareNamesLocalized['enUS'][69384] = "Luminescent Crawler"
 RareNamesLocalized['deDE'] = {}
-RareNamesLocalized['deDE'][50358] = "Konstrukt der Sonnenhäscher"
-RareNamesLocalized['deDE'][69664] = "Mumta"
-RareNamesLocalized['deDE'][69996] = "Ku'lai die Himmelsklaue"
-RareNamesLocalized['deDE'][69997] = "Progenitus"
-RareNamesLocalized['deDE'][69998] = "Goda"
-RareNamesLocalized['deDE'][69999] = "Gottkoloss Ramuk"
-RareNamesLocalized['deDE'][70000] = "Al'tabim der Allsehende"
-RareNamesLocalized['deDE'][70001] = "Rückenbrecher Uru"
-RareNamesLocalized['deDE'][70002] = "Lu-Ban"
-RareNamesLocalized['deDE'][70003] = "Molthor"
-RareNamesLocalized['deDE'][70530] = "Ra'sha"
+RareNamesLocalized['deDE'][73174] = "Archiereus der Flamme"
+RareNamesLocalized['deDE'][72775] = "Bufo"
+RareNamesLocalized['deDE'][73171] = "Champion der Schwarzen Flamme"
+RareNamesLocalized['deDE'][72045] = "Chelon"
+RareNamesLocalized['deDE'][73175] = "Glutfall"
+RareNamesLocalized['deDE'][73854] = "Kranichknirscher"
+RareNamesLocalized['deDE'][73281] = "Schreckensschiff Vazuvius"
+RareNamesLocalized['deDE'][73158] = "Smaragdkranich"
+RareNamesLocalized['deDE'][73279] = "Tiefenschlund"
+RareNamesLocalized['deDE'][73172] = "Funkenlord Gairan"
+RareNamesLocalized['deDE'][73282] = "Garnia"
+RareNamesLocalized['deDE'][72970] = "Golganarr"
+RareNamesLocalized['deDE'][73161] = "Großschildkröte Zornpanzer"
+RareNamesLocalized['deDE'][72909] = "Gu'chi der Schwarmbringer"
+RareNamesLocalized['deDE'][73167] = "Huolon"
+RareNamesLocalized['deDE'][73163] = "Kaiserpython"
+RareNamesLocalized['deDE'][73160] = "Eisenfellstahlhorn"
+RareNamesLocalized['deDE'][73169] = "Jakur von Ordos"
+RareNamesLocalized['deDE'][72193] = "Karkanos"
+RareNamesLocalized['deDE'][73277] = "Blattheiler"
+RareNamesLocalized['deDE'][73166] = "Monströse Dornzange"
+RareNamesLocalized['deDE'][72048] = "Klapperknochen"
+RareNamesLocalized['deDE'][73157] = "Steinmoos"
+RareNamesLocalized['deDE'][71864] = "Spelurk"
+RareNamesLocalized['deDE'][72769] = "Jadefeuergeist"
+RareNamesLocalized['deDE'][73704] = "Stinkezopf"
+RareNamesLocalized['deDE'][72808] = "Tsavo'ka"
+RareNamesLocalized['deDE'][73173] = "Urdur der Kauterisierer"
+RareNamesLocalized['deDE'][73170] = "Behüter Osu"
+RareNamesLocalized['deDE'][72245] = "Zesqua"
+RareNamesLocalized['deDE'][71919] = "Zhu-Gon der Saure"
 RareNamesLocalized['esES'] = {}
-RareNamesLocalized['esES'][50358] = "Atracasol descontrolado"
-RareNamesLocalized['esES'][69664] = "Mumta"
-RareNamesLocalized['esES'][69996] = "Ku'lai el Garracielo"
-RareNamesLocalized['esES'][69997] = "Progenitus"
-RareNamesLocalized['esES'][69998] = "Goda"
-RareNamesLocalized['esES'][69999] = "Dios mole Ramuk"
-RareNamesLocalized['esES'][70000] = "Al'tabim"
-RareNamesLocalized['esES'][70001] = "Backbreaker Uru" -- need translation
-RareNamesLocalized['esES'][70002] = "Lu-Ban" -- need translation
-RareNamesLocalized['esES'][70003] = "Molthor" -- need translation
-RareNamesLocalized['esES'][70530] = "Ra'sha" -- need translation
+RareNamesLocalized['esES'][73174] = "Sacerdote ilustre de las llamas"
+RareNamesLocalized['esES'][72775] = "Buffo"
+RareNamesLocalized['esES'][73171] = "Campeón de la Llama Negra"
+RareNamesLocalized['esES'][72045] = "Quelón"
+RareNamesLocalized['esES'][73175] = "Carbonos"
+RareNamesLocalized['esES'][73854] = "Mascagrullas"
+RareNamesLocalized['esES'][73281] = "Barco aterrador Vazuvius"
+RareNamesLocalized['esES'][73158] = "Ganso esmeralda"
+RareNamesLocalized['esES'][73279] = "Fauce Eterna"
+RareNamesLocalized['esES'][73172] = "Señor del sílex Gairan"
+RareNamesLocalized['esES'][73282] = "Garnia"
+RareNamesLocalized['esES'][72970] = "Golganarr"
+RareNamesLocalized['esES'][73161] = "Gran tortuga Irazón"
+RareNamesLocalized['esES'][72909] = "Gu'chi el Portaenjambres"
+RareNamesLocalized['esES'][73167] = "Huolon"
+RareNamesLocalized['esES'][73163] = "Pitón imperial"
+RareNamesLocalized['esES'][73160] = "Astado acerado Cueracero"
+RareNamesLocalized['esES'][73169] = "Jakur el Ordon"
+RareNamesLocalized['esES'][72193] = "Karkanos"
+RareNamesLocalized['esES'][73277] = "Sanador de hojas"
+RareNamesLocalized['esES'][73166] = "Pinzaespina monstruoso"
+RareNamesLocalized['esES'][72048] = "Ossotremulus"
+RareNamesLocalized['esES'][73157] = "Musgo de roca"
+RareNamesLocalized['esES'][71864] = "Espectrante"
+RareNamesLocalized['esES'][72769] = "Espíritu de fuego de jade"
+RareNamesLocalized['esES'][73704] = "Barbasucia"
+RareNamesLocalized['esES'][72808] = "Tsavo'ka"
+RareNamesLocalized['esES'][73173] = "Urdur el Cauterizador"
+RareNamesLocalized['esES'][73170] = "Vigía Osu"
+RareNamesLocalized['esES'][72245] = "Zesqua"
+RareNamesLocalized['esES'][71919] = "Zhu Gon el Agrio"
 RareNamesLocalized['frFR'] = {}
-RareNamesLocalized['frFR'][50358] = "Saccage-soleil détraqué"
-RareNamesLocalized['frFR'][69664] = "Mumta"
-RareNamesLocalized['frFR'][69996] = "Ku’lai, la Griffe du ciel"
-RareNamesLocalized['frFR'][69997] = "Progénitus"
-RareNamesLocalized['frFR'][69998] = "Goda"
-RareNamesLocalized['frFR'][69999] = "Dieu-mastodonte Ramuk"
-RareNamesLocalized['frFR'][70000] = "Al’tabim Qui-Voit-Tout"
-RareNamesLocalized['frFR'][70001] = "Backbreaker Uru" -- need translation
-RareNamesLocalized['frFR'][70002] = "Lu-Ban" -- need translation
-RareNamesLocalized['frFR'][70003] = "Molthor" -- need translation
-RareNamesLocalized['frFR'][70530] = "Ra'sha" -- need translation
-RareNamesLocalized['zhTW'] = {}
-RareNamesLocalized['zhTW'][50358] = "故障的奪日者傀儡"
-RareNamesLocalized['zhTW'][69664] = "孟塔"
-RareNamesLocalized['zhTW'][69996] = "『天爪』庫賴"
-RareNamesLocalized['zhTW'][69997] = "普羅堅尼斯"
-RareNamesLocalized['zhTW'][69998] = "戈達"
-RareNamesLocalized['zhTW'][69999] = "弒神巨人拉穆克"
-RareNamesLocalized['zhTW'][70000] = "『全知者』阿塔比姆"
-RareNamesLocalized['zhTW'][70001] = "斷脊者兀魯"
-RareNamesLocalized['zhTW'][70002] = "魯班"
-RareNamesLocalized['zhTW'][70003] = "莫托爾"
-RareNamesLocalized['zhTW'][70530] = "拉沙"
-RareNamesLocalized['zhCN'] = {}
-RareNamesLocalized['zhCN'][50358] = "错乱的夺日者构造体"
-RareNamesLocalized['zhCN'][69664] = "穆塔"
-RareNamesLocalized['zhCN'][69996] = "攫天者库莱"
-RareNamesLocalized['zhCN'][69997] = "布根尼图斯"
-RareNamesLocalized['zhCN'][69998] = "苟达"
-RareNamesLocalized['zhCN'][69999] = "巨灵神拉姆克"
-RareNamesLocalized['zhCN'][70000] = "全知者阿塔比姆"
-RareNamesLocalized['zhCN'][70001] = "碎脊者乌鲁"
-RareNamesLocalized['zhCN'][70002] = "路班"
-RareNamesLocalized['zhCN'][70003] = "莫托尔"
-RareNamesLocalized['zhCN'][70530] = "拉沙"
+RareNamesLocalized['frFR'][73174] = "Archiprêtre de flammes"
+RareNamesLocalized['frFR'][72775] = "Bufo"
+RareNamesLocalized['frFR'][73171] = "Champion de la flamme noire"
+RareNamesLocalized['frFR'][72045] = "Chelon"
+RareNamesLocalized['frFR'][73175] = "Cendrechute"
+RareNamesLocalized['frFR'][73854] = "Croque-grue"
+RareNamesLocalized['frFR'][73281] = "Bateau de l’effroi Vazuvius"
+RareNamesLocalized['frFR'][73158] = "Jars émeraude"
+RareNamesLocalized['frFR'][73279] = "Gueule-Éternelle"
+RareNamesLocalized['frFR'][73172] = "Seigneur des silex Gairan"
+RareNamesLocalized['frFR'][73282] = "Garnia"
+RareNamesLocalized['frFR'][72970] = "Golganarr"
+RareNamesLocalized['frFR'][73161] = "Grande tortue Écaille-de-Fureur"
+RareNamesLocalized['frFR'][72909] = "Gu’chi l’Essaimeur"
+RareNamesLocalized['frFR'][73167] = "Huolon"
+RareNamesLocalized['frFR'][73163] = "Python impérial"
+RareNamesLocalized['frFR'][73160] = "Corne-d’acier ferpoil"
+RareNamesLocalized['frFR'][73169] = "Jakur d’Ordos"
+RareNamesLocalized['frFR'][72193] = "Karkanos"
+RareNamesLocalized['frFR'][73277] = "Soigne-Feuille"
+RareNamesLocalized['frFR'][73166] = "Pincépine monstrueux"
+RareNamesLocalized['frFR'][72048] = "Déglingois"
+RareNamesLocalized['frFR'][73157] = "Mousse des rochers"
+RareNamesLocalized['frFR'][71864] = "Souterrant"
+RareNamesLocalized['frFR'][72769] = "Esprit de Jadefeu"
+RareNamesLocalized['frFR'][73704] = "Fouettnatte"
+RareNamesLocalized['frFR'][72808] = "Tsavo’ka"
+RareNamesLocalized['frFR'][73173] = "Urdur le Cautérisateur"
+RareNamesLocalized['frFR'][73170] = "Guetteur Osu"
+RareNamesLocalized['frFR'][72245] = "Zesqua"
+RareNamesLocalized['frFR'][71919] = "Zhu Gon l’Amer"
 
 local RareSeen = {}
 local RareKilled = {}
@@ -237,7 +353,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.2.0-12"
+RC.version = "5.4.0-2"
 
 
 function RC:getLocalRareName(id)
@@ -275,10 +391,12 @@ end
 function RC:setWaypoint(id)
 	if TomTom ~= nil then
 		if currentWaypointX == false and currentWaypointY == false then
-			TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(RareIDs[id]))
-			currentWaypointX = RareCoordsRaw[id]["x"]
-			currentWaypointY = RareCoordsRaw[id]["y"]
-			currentWaypointNPCID = RareIDs[id]
+			if RareCoordsRaw[id]["x"] ~= 0 and RareCoordsRaw[id]["y"] ~= 0 then
+				TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(RareIDs[id]))
+				currentWaypointX = RareCoordsRaw[id]["x"]
+				currentWaypointY = RareCoordsRaw[id]["y"]
+				currentWaypointNPCID = RareIDs[id]
+			end
 		end
 	end
 end
@@ -354,7 +472,7 @@ RC.res:Hide()
 
 RC.left.text = {}
 local i
-for i=0, 11 do
+for i=0, #RareIDs do
 	RC.left.text[i] = RC.left:CreateFontString("RC.left.text["..i.."]", nil, "GameFontNormal")
 	RC.left.text[i]:SetPoint("TOP", "RC.left", 2, -2 + -14.5*i)
 	RC.left.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
@@ -368,7 +486,7 @@ for i=0, 11 do
 end
 RC.left.icon = {}
 local i
-for i=0, 11 do
+for i=0, #RareIDs do
 	RC.left.icon[i] = CreateFrame("Frame", "RC.left.icon["..i.."]", RC)
 
 	if i == 0 then
@@ -387,7 +505,7 @@ for i=0, 11 do
 	end
 end
 RC.mid.button = {}
-for i=0, 11 do
+for i=0, #RareIDs do
 	RC.mid.button[i] = CreateFrame("Frame", "RC.mid.button["..i.."]", RC)
 	RC.mid.button[i]:SetPoint("TOPLEFT", "RC.mid", 0, -2 + -14.5*i)
 	RC.mid.button[i]:SetHeight(13)
@@ -410,7 +528,7 @@ for i=0, 11 do
 end
 RC.mid.text = {}
 local i
-for i=0, 11 do
+for i=0, #RareIDs do
 	RC.mid.text[i] = RC.mid:CreateFontString("RC.mid.text["..i.."]", nil, "GameFontNormal")
 	RC.mid.text[i]:SetPoint("TOP", "RC.mid", 2, -2 + -14.5*i)
 	RC.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
@@ -422,7 +540,7 @@ for i=0, 11 do
 end
 RC.right.text = {}
 local i
-for i=0, 11 do
+for i=0, #RareIDs do
 	RC.right.text[i] = RC.right:CreateFontString("RC.right.text["..i.."]", nil, "GameFontNormal")
 	RC.right.text[i]:SetPoint("TOP", "RC.right", 2, -2 + -14.5*i)
 	RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
@@ -438,8 +556,8 @@ local function updateText(self,elapsed)
 	if elapsed == nil then elapsed = 0 end
     total = total + elapsed
     if total >= 10 then
-		for i=1,GetAchievementNumCriteria(8103) do
-			_, _, completed, _, _, _, _, assetID, _, _ = GetAchievementCriteriaInfo(8103,i)
+		for i=1,GetAchievementNumCriteria(8714) do
+			_, _, completed, _, _, _, _, assetID, _, _ = GetAchievementCriteriaInfo(8714,i)
 			if completed then
 				RareAv[assetID] = true
 			else
@@ -589,7 +707,7 @@ end
 
 function RC:ShowOrHide(...)
 	local zone = GetZoneText()
-	if GetCurrentMapAreaID() == 928 then
+	if GetCurrentMapAreaID() == 951 then
 		RareAlive = {}
 		self:Show()
 		myChan = false
@@ -676,6 +794,7 @@ function RC:Chat(message, sender, language, channelString, target, flags, unknow
 end
 
 function RC:AddonMsg(prefix, message, channel, sender)
+	--print(prefix.." - "..channel.." - "..sender.."-"..message)
 	if prefix == "RCELVA" then
 		if channel == "WHISPER" and message == "GetStatus" then
 			for id,timestamp in pairs(RareSeen) do
@@ -940,7 +1059,6 @@ function RC.join(self, elapsed)
 		local channels = GetNumDisplayChannels()
 		if channels > chanchecked then
 			SetSelectedDisplayChannel(channels - chanchecked)
-			
 		end
 		chanchecked = chanchecked + 1 
 
