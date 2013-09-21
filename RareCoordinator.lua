@@ -331,6 +331,7 @@ RareNamesLocalized['frFR'][73170] = "Guetteur Osu"
 RareNamesLocalized['frFR'][72245] = "Zesqua"
 RareNamesLocalized['frFR'][71919] = "Zhu Gon l’Amer"
 
+
 local RareSeen = {}
 local RareKilled = {}
 local RareAlive = {}
