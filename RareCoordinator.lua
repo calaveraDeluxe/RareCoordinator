@@ -336,6 +336,39 @@ RareNamesLocalized['frFR'][73173] = "Urdur le Cautérisateur"
 RareNamesLocalized['frFR'][73170] = "Guetteur Osu"
 RareNamesLocalized['frFR'][72245] = "Zesqua"
 RareNamesLocalized['frFR'][71919] = "Zhu Gon l’Amer"
+RareNamesLocalized['ruRU'] = {}
+RareNamesLocalized['ruRU'][73174] = "Архиерей пламени"
+RareNamesLocalized['ruRU'][72775] = "Буфо"
+RareNamesLocalized['ruRU'][73171] = "Защитник Черного Пламени"
+RareNamesLocalized['ruRU'][72045] = "Шелон"
+RareNamesLocalized['ruRU'][73175] = "Пеплопад"
+RareNamesLocalized['ruRU'][73854] = "Журавлецап"
+RareNamesLocalized['ruRU'][73281] = "Проклятый корабль Вазувий"
+RareNamesLocalized['ruRU'][73158] = "Изумрудный гусак"
+RareNamesLocalized['ruRU'][73279] = "Вечножор"
+RareNamesLocalized['ruRU'][73172] = "Повелитель кремня Гайран"
+RareNamesLocalized['ruRU'][73282] = "Гарния"
+RareNamesLocalized['ruRU'][72970] = "Голганарр"
+RareNamesLocalized['ruRU'][73161] = "Большая черепаха"
+RareNamesLocalized['ruRU'][72909] = "Гу'чи Зовущий Рой"
+RareNamesLocalized['ruRU'][73167] = "Хулон "
+RareNamesLocalized['ruRU'][73163] = "Императорский питон"
+RareNamesLocalized['ruRU'][73160] = "Твердорогий сталемех"
+RareNamesLocalized['ruRU'][73169] = "Якур Ордосский"
+RareNamesLocalized['ruRU'][72193] = "Карканос"
+RareNamesLocalized['ruRU'][73277] = "Целитель листвы"
+RareNamesLocalized['ruRU'][73166] = "Огромный хребтохват"
+RareNamesLocalized['ruRU'][72048] = "Косохрип"
+RareNamesLocalized['ruRU'][73157] = "Пещерный Мох"
+RareNamesLocalized['ruRU'][71864] = "Чароброд"
+RareNamesLocalized['ruRU'][72769] = "Дух Нефритового Пламени"
+RareNamesLocalized['ruRU'][73704] = "Вонекос "
+RareNamesLocalized['ruRU'][72808] = "Тсаво'ка"
+RareNamesLocalized['ruRU'][73173] = "Урдур Прижигатель"
+RareNamesLocalized['ruRU'][73170] = "Смотритель Осу"
+RareNamesLocalized['ruRU'][72245] = "Зесква"
+RareNamesLocalized['ruRU'][71919] = "Чжу-Гонь Прокисший"
+
 local SoundsToPlay = {}
 SoundsToPlay['none'] = ""
 SoundsToPlay['DIIING'] = "sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg"
@@ -347,6 +380,7 @@ local RareKilled = {}
 local RareAlive = {}
 local RareAliveHP = {}
 local RareAnnounced = {}
+local RareAnnouncedSelf = {}
 local LastSent = {}
 local RareAv = {}
 local SoundPlayed = {}
@@ -364,7 +398,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.4.0-5"
+RC.version = "5.4.0-6"
 
 
 function RC:getLocalRareName(id)
@@ -421,6 +455,7 @@ local function OnMouseDownAnnounce(id)
 		end
 		SendChatMessage("[RCELVA]"..RC.version.."_"..RareIDs[id].."_announce_"..time().."_", "CHANNEL", nil, RC:getChanID(GetChannelList()))
 		RareAnnounced[RareIDs[id]] = time()
+		RareAnnouncedSelf[RareIDs[id]] = time()
 	end
 end
 
@@ -1022,8 +1057,9 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 					RareAlive[v] = nil
 					RareAliveHP[v] = nil
 					SendChatMessage("[RCELVA]"..self.version.."_"..npcID.."_dead_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
-					if RareAnnounced[v] then
+					if RareAnnouncedSelf[v] then
 						SendChatMessage("{rt8} [RareCoordinator] "..RC:getLocalRareName(npcID).." is now dead {rt8}", "CHANNEL", nil, 1)
+						RareAnnouncedSelf[v] = nil
 						RareAnnounced[v] = nil
 					end
 					if currentWaypointNPCID ~= nil then
