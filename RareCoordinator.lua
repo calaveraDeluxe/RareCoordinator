@@ -51,6 +51,11 @@ local function onResize(self, width, height)
 				end
 			end
 		end
+		if self.left.settingsicon ~= nil then
+			self.left.settingsicon:SetPoint("TOPLEFT", "RC.left", 1*scale, -1*scale)
+			self.left.settingsicon:SetWidth(10*scale)
+			self.left.settingsicon:SetHeight(10*scale)
+		end
 		
 	end
 	if self.mid ~= nil then
@@ -71,7 +76,7 @@ local function onResize(self, width, height)
 		if self.mid.button ~= nil then
 			local i
 			for i=0,table.getn(self.mid.button) do
-				self.mid.button[i]:SetPoint("TOPLEFT", "RC.mid", 0, -2-(15.5*i)*scale)
+				self.mid.button[i]:SetPoint("TOPLEFT", "RC.mid", 0, -2-(15.4*i)*scale)
 				self.mid.button[i]:SetHeight(13*scale)
 				self.mid.button[i]:SetWidth(self.mid:GetWidth())
 				self.mid.button[i].icon:SetWidth(10*scale)
@@ -100,6 +105,7 @@ end
 --------------------------------
 
 local locked = true
+local optshown = false
 local RareIDs = {
 	73174, -- Archiereus of Flame
 	72775, -- Bufo
@@ -330,6 +336,10 @@ RareNamesLocalized['frFR'][73173] = "Urdur le Cautérisateur"
 RareNamesLocalized['frFR'][73170] = "Guetteur Osu"
 RareNamesLocalized['frFR'][72245] = "Zesqua"
 RareNamesLocalized['frFR'][71919] = "Zhu Gon l’Amer"
+local SoundsToPlay = {}
+SoundsToPlay['none'] = ""
+SoundsToPlay['DIIING'] = "sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg"
+SoundsToPlay['You are not prepared!'] = "sound\\Creature\\Illidan\\BLACK_Illidan_04.wav"
 
 
 local RareSeen = {}
@@ -354,7 +364,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.4.0-4"
+RC.version = "5.4.0-5"
 
 
 function RC:getLocalRareName(id)
@@ -409,10 +419,28 @@ local function OnMouseDownAnnounce(id)
 		else
 			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(RareIDs[id]).."("..RareAliveHP[RareIDs[id]].."%): "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
 		end
+		SendChatMessage("[RCELVA]"..RC.version.."_"..RareIDs[id].."_announce_"..time().."_", "CHANNEL", nil, RC:getChanID(GetChannelList()))
 		RareAnnounced[RareIDs[id]] = time()
 	end
 end
 
+function OptShowOrHide()
+	if optshown then
+		RC.opt:Hide()
+		optshown = false
+	else
+		RC.opt:Show()
+		UIDropDownMenu_SetText(RC.opt.sound.dropdown, RCDB.sound)
+		if locked then
+			RC.opt.locked.status:SetText("Frame is |cffff0000locked")
+			RC.opt.locked.button:SetText("unlock")
+		else
+			RC.opt.locked.status:SetText("Frame is |cff00ff00unlocked")
+			RC.opt.locked.button:SetText("lock")
+		end
+		optshown = true
+	end
+end
 
 RC:SetWidth(300)
 RC:SetHeight(200)
@@ -505,6 +533,15 @@ for i=0, #RareIDs do
 		RC.left.icon[i].texture:SetAllPoints(RC.left.icon[i])
 	end
 end
+
+RC.left.settingsicon = CreateFrame("Frame", "RC.left.settingsicon", RC)
+RC.left.settingsicon:SetPoint("TOPLEFT", "RC.left", 6, -5)
+RC.left.settingsicon:SetWidth(10)
+RC.left.settingsicon:SetHeight(10)
+RC.left.settingsicon.texture = RC.left.settingsicon:CreateTexture(nil, "OVERLAY")
+RC.left.settingsicon.texture:SetTexture([[Interface\AddOns\RareCoordinator\settings.tga]])
+RC.left.settingsicon.texture:SetAllPoints(RC.left.settingsicon)
+
 RC.mid.button = {}
 for i=0, #RareIDs do
 	RC.mid.button[i] = CreateFrame("Frame", "RC.mid.button["..i.."]", RC)
@@ -551,6 +588,73 @@ for i=0, #RareIDs do
 		RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
 	end
 end
+
+RC.opt = CreateFrame("Frame", "RC.opt", RC)
+RC.opt:SetWidth(200)
+RC.opt:SetHeight(87)
+RC.opt:SetPoint("TOPLEFT", RC, "TOPRIGHT", 1, 0)
+RC.opt.texture = RC.opt:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.opt.texture:SetTexture(0,0,0,0.4)
+RC.opt.texture:SetAllPoints(RC.opt)
+
+RC.opt.locked = CreateFrame("Frame", "RC.opt.locked", RC.opt)
+RC.opt.locked:SetWidth(RC.opt:GetWidth() - 8)
+RC.opt.locked:SetHeight(20)
+RC.opt.locked:SetPoint("TOPLEFT", RC.opt, 4, -4)
+RC.opt.locked.texture = RC.opt.locked:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.opt.locked.texture:SetTexture(0,0,0,0.2)
+RC.opt.locked.texture:SetAllPoints(RC.opt.locked)
+
+RC.opt.locked.status = RC.opt.locked:CreateFontString("RC.opt.locked.status", nil, "GameFontNormal")
+RC.opt.locked.status:SetPoint("LEFT", "RC.opt.locked", 4, 0)
+RC.opt.locked.status:SetFont("Fonts\\ARIALN.TTF",12)
+RC.opt.locked.status:SetTextColor(1,1,1)
+RC.opt.locked.status:SetText("Frame is")
+
+RC.opt.locked.button = CreateFrame("Button", "RC.opt.locked.button", RC.opt.locked, "UIPanelButtonTemplate")
+RC.opt.locked.button:SetPoint("RIGHT",-4,0)
+RC.opt.locked.button:SetWidth(80)
+RC.opt.locked.button:SetHeight(16)
+RC.opt.locked.button:SetText("lock")
+
+RC.opt.sound = CreateFrame("Frame", "RC.opt.sound", RC.opt)
+RC.opt.sound:SetWidth(RC.opt:GetWidth() - 8)
+RC.opt.sound:SetHeight(55)
+RC.opt.sound:SetPoint("TOPLEFT", RC.opt.locked, "BOTTOMLEFT", 0, -4)
+RC.opt.sound.texture = RC.opt.sound:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.opt.sound.texture:SetTexture(0,0,0,0.2)
+RC.opt.sound.texture:SetAllPoints(RC.opt.sound)
+
+RC.opt.sound.caption = RC.opt.sound:CreateFontString("RC.opt.sound.caption", nil, "GameFontNormal")
+RC.opt.sound.caption:SetPoint("TOPLEFT", "RC.opt.sound", 4, -4)
+RC.opt.sound.caption:SetFont("Fonts\\ARIALN.TTF",12)
+RC.opt.sound.caption:SetTextColor(1,1,1)
+RC.opt.sound.caption:SetText("Sound to play when a rare is found")
+
+RC.opt.sound.dropdown = CreateFrame("Frame", "RC.opt.sound.dropdown", RC.opt.sound, "UIDropDownMenuTemplate")
+RC.opt.sound.dropdown:SetPoint("TOPLEFT", "RC.opt.sound", -8, -21)
+UIDropDownMenu_SetWidth(RC.opt.sound.dropdown, 160) 
+UIDropDownMenu_Initialize(RC.opt.sound.dropdown,function(self)
+	local info = UIDropDownMenu_CreateInfo()
+	local i = 0
+	for k,v in pairs(SoundsToPlay) do
+		info.text = k
+		info.arg1 = k
+		info.func = self.SetValue
+		UIDropDownMenu_AddButton(info)
+		i = i + 1
+	end
+end)
+
+function RC.opt.sound.dropdown:SetValue(newValue)
+	UIDropDownMenu_SetText(RC.opt.sound.dropdown, newValue)
+	RCDB.sound = newValue
+	PlaySoundFile(SoundsToPlay[newValue], "master")
+end
+
+RC.opt:Hide()
+
+RC.left.settingsicon:SetScript("OnMouseDown", function (self) OptShowOrHide() end)
 
 local total = 0
 local function updateText(self,elapsed)
@@ -601,10 +705,10 @@ local function updateText(self,elapsed)
 				for i=1,table.getn(RC.mid.text) do
 					if RareAlive[RareIDs[i]] ~= nil then
 						if SoundPlayed[RareIDs[i]] == nil then
-							PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
+							PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
 							SoundPlayed[RareIDs[i]] = time()
 						elseif time() > SoundPlayed[RareIDs[i]] + 600 then
-							PlaySoundFile("sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg", "MASTER")
+							PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
 							SoundPlayed[RareIDs[i]] = time()
 						end
 						RC.mid.button[i]:Show()
@@ -677,6 +781,9 @@ function RC:OnLoad(...)
 			self:ClearAllPoints()
 			self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", RCDB.x, RCDB.y)
 		end
+		if RCDB.sound == nil then
+			RCDB.sound = "DIIING"
+		end
 	end
 end
 
@@ -705,7 +812,7 @@ function RC:UnitHealth(unit)
 	end
 end
 
-
+--894
 function RC:ShowOrHide(...)
 	local zone = GetZoneText()
 	if GetCurrentMapAreaID() == 951 then
@@ -714,12 +821,15 @@ function RC:ShowOrHide(...)
 		myChan = false
 		self:SetScript("OnUpdate", RC.join)
 		self:RegisterEvent("UNIT_HEALTH")
+		RegisterAddonMessagePrefix("RCELVA")
 	else
 		self:Hide()
 		LeaveChannelByName("RCELVA")
 		self:UnregisterEvent("UNIT_HEALTH")
 	end
 end
+
+
 
 
 function RC:Chat(message, sender, language, channelString, target, flags, unknown, channelNumber, channelName, unknown, counter, guid)
@@ -783,6 +893,8 @@ function RC:Chat(message, sender, language, channelString, target, flags, unknow
 							end
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
+						elseif eventType == "announce" then
+							RareAnnounced[v] = eventTime
 						end
 						updateText(self, 100)
 						self:CompareVersion(eventVersion)
@@ -1068,20 +1180,9 @@ function RC.join(self, elapsed)
   end
 end
 
-
-
-function RC:DebugMsg(msg)
-	print(msg)
-		
-end
-
-SLASH_RARECOORDINATOR1 = "/rare"
-SLASH_RARECOORDINATOR2 = "/rarecoordinator"
-SLASH_RARECOORDINATOR3 = "/rc"
-local function SlashHandler(msg, editbox)
-	--print("Usage")
+local function LockOrUnlock()
 	if locked then
-		print("RareCoordinator is now unlocked. - Type /rc or /rare to lock it")
+		print("RareCoordinator is now |cff00ff00unlocked|r. - Type /rc or /rare to lock it")
 		
 		RC:EnableMouse(true)
 		RC:SetMovable(true)
@@ -1093,9 +1194,12 @@ local function SlashHandler(msg, editbox)
 		RC:Show()
 		RC.res:Show()
 		
+		RC.opt.locked.status:SetText("Frame is |cff00ff00unlocked")
+		RC.opt.locked.button:SetText("lock")
+		
 		locked = false
 	else
-		print("RareCoordinator is now locked. - Type /rc or /rare to unlock it")	
+		print("RareCoordinator is now |cffff0000locked|r. - Type /rc or /rare to unlock it")	
 		
 		RC:SetMovable(false)
 		RC:EnableMouse(false)
@@ -1107,8 +1211,26 @@ local function SlashHandler(msg, editbox)
 		RC:ShowOrHide()
 		RC.res:Hide()
 		
+		RC.opt.locked.status:SetText("Frame is |cffff0000locked")
+		RC.opt.locked.button:SetText("unlock")
+		
 		locked = true
 	end
+end
+
+
+function RC:DebugMsg(msg)
+	print(msg)
+		
+end
+
+
+SLASH_RARECOORDINATOR1 = "/rare"
+SLASH_RARECOORDINATOR2 = "/rarecoordinator"
+SLASH_RARECOORDINATOR3 = "/rc"
+local function SlashHandler(msg, editbox)
+	--print("Usage")
+	LockOrUnlock()
 end
 SlashCmdList["RARECOORDINATOR"] = SlashHandler;
 
@@ -1131,6 +1253,8 @@ RC:RegisterEvent("PLAYER_ENTERING_WORLD")
 RC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 RC:RegisterEvent("CHANNEL_ROSTER_UPDATE")
 
+
+RC.opt.locked.button:SetScript("OnClick", function(self) LockOrUnlock() end)
 
 updateText(RC, 100)
 onResize(RC, RC:GetWidth(), 0)
