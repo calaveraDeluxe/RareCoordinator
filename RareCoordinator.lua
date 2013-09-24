@@ -856,7 +856,6 @@ function RC:UnitHealth(unit)
 			if v == id then
 				local per = self:getTargetPercentHProunded()
 				if per and per >= 0 then
-					print(per)
 					if RareAliveHP[id] ~= nil then
 						if RareAliveHP[id] > per then
 							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per.."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
