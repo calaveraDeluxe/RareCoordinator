@@ -14,7 +14,7 @@ local function OnDragHandleMouseDown(self) self.frame:StartSizing("BOTTOMRIGHT")
 local function OnDragHandleMouseUp(self, button) self.frame:StopMovingOrSizing() end
 
 local function onResize(self, width, height)
-	height = width*1.69
+	height = width*1.74
 	RCDB.width = width
 	RCDB.height = height
 	self:SetHeight(height)
@@ -107,12 +107,13 @@ end
 local locked = true
 local optshown = false
 local RareIDs = {
-	73174, -- Archiereus of Flame
+	73174, -- Archiereus of Flame Sanctuary
+	73666, -- Archiereus of Flame Summoned
 	72775, -- Bufo
 	73171, -- Champion of the Black Flame
 	72045, -- Chelon
 	73175, -- Cinderfall
-	73854, -- Cranegnasher
+	72049, -- Cranegnasher
 	73281, -- Dread Ship Vazuvius
 	73158, -- Emerald Gander
 	73279, -- Evermaw
@@ -141,7 +142,8 @@ local RareIDs = {
 	--69384  -- Luminescent Crawler - FOR TESTING ONLY
 }
 local RareCoords = {
-	"varied spawn: either 53.8 / 32.2 or 36.0 / 30.0", -- Archiereus of Flame
+	"next to any cauldron within Ordon Sanctuary", -- Archiereus of Flame Sanctuary
+	"on the Tree-Breeze Terrace (34/28)", -- Archiereus of Flame Summoned
 	"around 65.4 / 70.0", -- Bufo
 	"patrols between the 2 big bridges", -- Champion of the Black Flame
 	"25.3 / 35.8", -- Chelon
@@ -174,7 +176,8 @@ local RareCoords = {
 	"37.4 / 77.4" -- Zhu-Gon the Sour
 }
 local RareCoordsRaw = {
-	{x=0, y=0}, -- Archiereus of Flame
+	{x=49.7, y=22.2}, -- Archiereus of Flame Sanctuary
+	{x=34.9, y=28.9}, -- Archiereus of Flame Summoned
 	{x=65.4, y=70.0}, -- Bufo
 	{x=0, y=0}, -- Champion of the Black Flame
 	{x=25.3, y=35.8}, -- Chelon
@@ -208,12 +211,13 @@ local RareCoordsRaw = {
 }
 local RareNamesLocalized = {};
 RareNamesLocalized['enUS'] = {}
-RareNamesLocalized['enUS'][73174] = "Archiereus of Flame"
+RareNamesLocalized['enUS'][73174] = "Archiereus of Flame (Sanctuary)" 
+RareNamesLocalized['enUS'][73666] = "Archiereus of Flame (Summoned)"
 RareNamesLocalized['enUS'][72775] = "Bufo"
 RareNamesLocalized['enUS'][73171] = "Champion of the Black Flame"
 RareNamesLocalized['enUS'][72045] = "Chelon"
 RareNamesLocalized['enUS'][73175] = "Cinderfall"
-RareNamesLocalized['enUS'][73854] = "Cranegnasher"
+RareNamesLocalized['enUS'][72049] = "Cranegnasher"
 RareNamesLocalized['enUS'][73281] = "Dread Ship Vazuvius"
 RareNamesLocalized['enUS'][73158] = "Emerald Gander"
 RareNamesLocalized['enUS'][73279] = "Evermaw"
@@ -241,12 +245,13 @@ RareNamesLocalized['enUS'][72245] = "Zesqua"
 RareNamesLocalized['enUS'][71919] = "Zhu-Gon the Sour"
 --RareNamesLocalized['enUS'][69384] = "Luminescent Crawler"
 RareNamesLocalized['deDE'] = {}
-RareNamesLocalized['deDE'][73174] = "Archiereus der Flamme"
+RareNamesLocalized['deDE'][73174] = "Archiereus der Flamme (Heiligtum)"
+RareNamesLocalized['deDE'][73666] = "Archiereus der Flamme (Beschworen)"
 RareNamesLocalized['deDE'][72775] = "Bufo"
 RareNamesLocalized['deDE'][73171] = "Champion der Schwarzen Flamme"
 RareNamesLocalized['deDE'][72045] = "Chelon"
 RareNamesLocalized['deDE'][73175] = "Glutfall"
-RareNamesLocalized['deDE'][73854] = "Kranichknirscher"
+RareNamesLocalized['deDE'][72049] = "Kranichknirscher"
 RareNamesLocalized['deDE'][73281] = "Schreckensschiff Vazuvius"
 RareNamesLocalized['deDE'][73158] = "Smaragdkranich"
 RareNamesLocalized['deDE'][73279] = "Tiefenschlund"
@@ -273,12 +278,13 @@ RareNamesLocalized['deDE'][73170] = "Behüter Osu"
 RareNamesLocalized['deDE'][72245] = "Zesqua"
 RareNamesLocalized['deDE'][71919] = "Zhu-Gon der Saure"
 RareNamesLocalized['esES'] = {}
-RareNamesLocalized['esES'][73174] = "Sacerdote ilustre de las llamas"
+RareNamesLocalized['esES'][73174] = "Sacerdote i.d.l. llamas (Sanctuaire)"
+RareNamesLocalized['esES'][73666] = "Sacerdote i.d.l. llamas (Invocado)"
 RareNamesLocalized['esES'][72775] = "Buffo"
 RareNamesLocalized['esES'][73171] = "Campeón de la Llama Negra"
 RareNamesLocalized['esES'][72045] = "Quelón"
 RareNamesLocalized['esES'][73175] = "Carbonos"
-RareNamesLocalized['esES'][73854] = "Mascagrullas"
+RareNamesLocalized['esES'][72049] = "Mascagrullas"
 RareNamesLocalized['esES'][73281] = "Barco aterrador Vazuvius"
 RareNamesLocalized['esES'][73158] = "Ganso esmeralda"
 RareNamesLocalized['esES'][73279] = "Fauce Eterna"
@@ -305,12 +311,13 @@ RareNamesLocalized['esES'][73170] = "Vigía Osu"
 RareNamesLocalized['esES'][72245] = "Zesqua"
 RareNamesLocalized['esES'][71919] = "Zhu Gon el Agrio"
 RareNamesLocalized['frFR'] = {}
-RareNamesLocalized['frFR'][73174] = "Archiprêtre de flammes"
+RareNamesLocalized['frFR'][73174] = "Archiprêtre de flammes (sanctuaire)"
+RareNamesLocalized['frFR'][73666] = "Archiprêtre de flammes (convoqué)"
 RareNamesLocalized['frFR'][72775] = "Bufo"
 RareNamesLocalized['frFR'][73171] = "Champion de la flamme noire"
 RareNamesLocalized['frFR'][72045] = "Chelon"
 RareNamesLocalized['frFR'][73175] = "Cendrechute"
-RareNamesLocalized['frFR'][73854] = "Croque-grue"
+RareNamesLocalized['frFR'][72049] = "Croque-grue"
 RareNamesLocalized['frFR'][73281] = "Bateau de l’effroi Vazuvius"
 RareNamesLocalized['frFR'][73158] = "Jars émeraude"
 RareNamesLocalized['frFR'][73279] = "Gueule-Éternelle"
@@ -337,12 +344,13 @@ RareNamesLocalized['frFR'][73170] = "Guetteur Osu"
 RareNamesLocalized['frFR'][72245] = "Zesqua"
 RareNamesLocalized['frFR'][71919] = "Zhu Gon l’Amer"
 RareNamesLocalized['ruRU'] = {}
-RareNamesLocalized['ruRU'][73174] = "Архиерей пламени"
+RareNamesLocalized['ruRU'][73174] = "Архиерей пламени (святилище)"
+RareNamesLocalized['ruRU'][73666] = "Архиерей пламени (вызванный)"
 RareNamesLocalized['ruRU'][72775] = "Буфо"
 RareNamesLocalized['ruRU'][73171] = "Защитник Черного Пламени"
 RareNamesLocalized['ruRU'][72045] = "Шелон"
 RareNamesLocalized['ruRU'][73175] = "Пеплопад"
-RareNamesLocalized['ruRU'][73854] = "Журавлецап"
+RareNamesLocalized['ruRU'][72049] = "Журавлецап"
 RareNamesLocalized['ruRU'][73281] = "Проклятый корабль Вазувий"
 RareNamesLocalized['ruRU'][73158] = "Изумрудный гусак"
 RareNamesLocalized['ruRU'][73279] = "Вечножор"
@@ -388,6 +396,7 @@ local SoundPlayed = {}
 --local SoundPlayed = 0
 local VersionNotify = false
 local myChan = false
+local chanchecked = 0
 
 local txt = ""
 local currentWaypointX = false
@@ -698,6 +707,9 @@ local function updateText(self,elapsed)
     if total >= 10 then
 		for i=1,GetAchievementNumCriteria(8714) do
 			_, _, completed, _, _, _, _, assetID, _, _ = GetAchievementCriteriaInfo(8714,i)
+			if assetID == 73854 then -- Fix for Cranegnasher since he has 2 NPC IDs
+				assetID = 72049
+			end
 			if completed then
 				RareAv[assetID] = true
 			else
@@ -705,13 +717,25 @@ local function updateText(self,elapsed)
 			end		
 		end
 		for k,v in pairs(RareSeen) do
-			if tonumber(v)+2*60*60 < time() then
-				RareSeen[k] = nil
+			if tonumber(k) == 72970 then -- longer reset for Golganarr
+				if tonumber(v)+24*60*60 < time() then
+					RareSeen[k] = nil
+				end
+			else
+				if tonumber(v)+3*60*60 < time() then
+					RareSeen[k] = nil
+				end
 			end
 		end
 		for k,v in pairs(RareKilled) do
-			if tonumber(v)+2*60*60 < time() then
-				RareKilled[k] = nil
+			if tonumber(k) == 72970 then -- longer reset for Golganarr
+				if tonumber(v)+24*60*60 < time() then
+					RareKilled[k] = nil
+				end
+			else
+				if tonumber(v)+3*60*60 < time() then
+					RareKilled[k] = nil
+				end
 			end
 		end
 		for k,v in pairs(RareAlive) do
@@ -815,6 +839,8 @@ function RC:OnLoad(...)
 		else
 			self:ClearAllPoints()
 			self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", RCDB.x, RCDB.y)
+			self:SetWidth(RCDB.width)
+			onResize(RC, RC:GetWidth(), 0)
 		end
 		if RCDB.sound == nil then
 			RCDB.sound = "DIIING"
@@ -830,6 +856,7 @@ function RC:UnitHealth(unit)
 			if v == id then
 				local per = self:getTargetPercentHProunded()
 				if per and per >= 0 then
+					print(per)
 					if RareAliveHP[id] ~= nil then
 						if RareAliveHP[id] > per then
 							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per.."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
@@ -854,6 +881,8 @@ function RC:ShowOrHide(...)
 		RareAlive = {}
 		self:Show()
 		myChan = false
+		needStatus = true
+		chanchecked = 0
 		self:SetScript("OnUpdate", RC.join)
 		self:RegisterEvent("UNIT_HEALTH")
 		RegisterAddonMessagePrefix("RCELVA")
@@ -1156,8 +1185,13 @@ function RC:Target(...)
 			if v == id then
 					msg = time() .. " Rare Mob targeted: " .. id
 					if UnitHealth("target") > 0 then
+						local per = self:getTargetPercentHProunded()
 						RareAlive[v] = time()
-						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+						if per == 100 then
+							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive100_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+						else
+							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+						end
 					else
 						RareAlive[v] = nil
 						RareAliveHP[v] = nil
@@ -1188,7 +1222,6 @@ function RC:Target(...)
 end
 
 local waittime = 0
-local chanchecked = 0
 function RC.join(self, elapsed)
   waittime = waittime + elapsed
   if waittime > 1 then
