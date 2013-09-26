@@ -19,6 +19,8 @@ local function onResize(self, width, height)
 	RCDB.height = height
 	self:SetHeight(height)
 	
+	RCminimized:SetWidth(self:GetWidth())
+	
 	local scale = width/300
 	
 	
@@ -56,6 +58,17 @@ local function onResize(self, width, height)
 			self.left.settingsicon:SetWidth(10*scale)
 			self.left.settingsicon:SetHeight(10*scale)
 		end
+		if self.left.minimizeicon ~= nil then
+			self.left.settingsicon:SetPoint("TOPLEFT", "RC.left.minimizeicon", "TOPRIGHT", 2*scale, 0*scale)
+			self.left.minimizeicon:SetWidth(10*scale)
+			self.left.minimizeicon:SetHeight(10*scale)
+		end
+		if RCminimized.maximizeicon ~= nil then
+			RCminimized.maximizeicon:SetPoint("LEFT", "RCminimized", 4*scale, 0)
+			RCminimized.maximizeicon:SetWidth(10*scale)
+			RCminimized.maximizeicon:SetHeight(10*scale)
+		end
+		
 		
 	end
 	if self.mid ~= nil then
@@ -106,6 +119,7 @@ end
 
 local locked = true
 local optshown = false
+local minimized = false
 local RareIDs = {
 	73174, -- Archiereus of Flame Sanctuary
 	73666, -- Archiereus of Flame Summoned
@@ -486,6 +500,18 @@ function OptShowOrHide()
 	end
 end
 
+function MinMaximize()
+	if minimized then
+		RC:Show()
+		RCminimized:Hide()
+		minimized = false
+	else
+		RC:Hide()
+		RCminimized:Show()
+		minimized = true
+	end
+end
+
 RC:SetWidth(300)
 RC:SetHeight(200)
 RC:SetFrameStrata("BACKGROUND")
@@ -578,8 +604,16 @@ for i=0, #RareIDs do
 	end
 end
 
-RC.left.settingsicon = CreateFrame("Frame", "RC.left.settingsicon", RC)
-RC.left.settingsicon:SetPoint("TOPLEFT", "RC.left", 6, -5)
+RC.left.minimizeicon = CreateFrame("Frame", "RC.left.minimizeicon", RC.left)
+RC.left.minimizeicon:SetPoint("TOPLEFT", "RC.left", 0, 0)
+RC.left.minimizeicon:SetWidth(10)
+RC.left.minimizeicon:SetHeight(10)
+RC.left.minimizeicon.texture = RC.left.minimizeicon:CreateTexture(nil, "OVERLAY")
+RC.left.minimizeicon.texture:SetTexture([[Interface\AddOns\RareCoordinator\minus.tga]])
+RC.left.minimizeicon.texture:SetAllPoints(RC.left.minimizeicon)
+
+RC.left.settingsicon = CreateFrame("Frame", "RC.left.settingsicon", RC.left)
+RC.left.settingsicon:SetPoint("TOPLEFT", "RC.left.minimizeicon", "TOPRIGHT", 0, 0)
 RC.left.settingsicon:SetWidth(10)
 RC.left.settingsicon:SetHeight(10)
 RC.left.settingsicon.texture = RC.left.settingsicon:CreateTexture(nil, "OVERLAY")
@@ -699,6 +733,37 @@ end
 RC.opt:Hide()
 
 RC.left.settingsicon:SetScript("OnMouseDown", function (self) OptShowOrHide() end)
+RC.left.minimizeicon:SetScript("OnMouseDown", function (self) MinMaximize() end)
+
+
+
+RCminimized = CreateFrame("Frame", "RCminimized", UIParent)
+RCminimized:SetWidth(RC:GetWidth())
+RCminimized:SetHeight(20)
+RCminimized:SetPoint("TOPLEFT", RC, "TOPLEFT", 0, 0)
+RCminimized.texture = RCminimized:CreateTexture(nil,"BACKGROUND", nil, 1)
+RCminimized.texture:SetTexture(0,0,0,0.6)
+RCminimized.texture:SetAllPoints(RCminimized)
+
+
+RCminimized.maximizeicon = CreateFrame("Frame", "RCminimized.maximizeicon", RCminimized)
+RCminimized.maximizeicon:SetPoint("LEFT", "RCminimized", 4, 0)
+RCminimized.maximizeicon:SetWidth(10)
+RCminimized.maximizeicon:SetHeight(10)
+RCminimized.maximizeicon.texture = RCminimized.maximizeicon:CreateTexture(nil, "OVERLAY")
+RCminimized.maximizeicon.texture:SetTexture([[Interface\AddOns\RareCoordinator\plus.tga]])
+RCminimized.maximizeicon.texture:SetAllPoints(RCminimized.maximizeicon)
+
+RCminimized.title = RCminimized:CreateFontString("RCminimized.title", nil, "GameFontNormal")
+RCminimized.title:SetPoint("CENTER", "RCminimized", 0, 0)
+RCminimized.title:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
+RCminimized.title:SetTextColor(1,1,1)
+RCminimized.title:SetText("RareCoordinator")
+
+RCminimized:Hide()
+RCminimized.maximizeicon:SetScript("OnMouseDown", function (self) MinMaximize() end)
+
+
 
 local total = 0
 local function updateText(self,elapsed)
