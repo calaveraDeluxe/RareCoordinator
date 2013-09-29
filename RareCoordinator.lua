@@ -403,6 +403,7 @@ local RareAlive = {}
 local RareAliveHP = {}
 local RareAnnounced = {}
 local RareAnnouncedSelf = {}
+local RareNotified = {}
 local LastSent = {}
 local RareAv = {}
 local SoundPlayed = {}
@@ -457,7 +458,7 @@ function RC:getTargetPercentHProunded()
 end
 
 function RC:setWaypoint(id)
-	if TomTom ~= nil then
+	if TomTom ~= nil and RCDB.tomtom then
 		if currentWaypointX == false and currentWaypointY == false then
 			if RareCoordsRaw[id]["x"] ~= 0 and RareCoordsRaw[id]["y"] ~= 0 then
 				TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(RareIDs[id]))
@@ -482,7 +483,11 @@ local function OnMouseDownAnnounce(id)
 	end
 end
 
-function OptShowOrHide()
+local function OnMouseDownTarget(id)
+	print("Target")
+end
+
+local function OptShowOrHide()
 	if optshown then
 		RC.opt:Hide()
 		optshown = false
@@ -500,7 +505,7 @@ function OptShowOrHide()
 	end
 end
 
-function MinMaximize()
+local function MinMaximize()
 	if minimized then
 		RC:Show()
 		RCminimized:Hide()
@@ -509,6 +514,59 @@ function MinMaximize()
 		RC:Hide()
 		RCminimized:Show()
 		minimized = true
+	end
+end
+
+local function IsInXRealmGrp()
+	local n = GetNumGroupMembers()
+	if n == 0 then
+		return false
+	end
+	local xrealmmemberfound = false
+	local i = 0
+	if IsInRaid() then
+		for i=1, n do
+			if UnitExists("raid"..i) then
+				local _, realm = UnitName("raid"..i)
+				if realm ~= nil and strlen(realm) > 0 then
+					xrealmmemberfound = true
+				end
+			end
+		end
+		if xrealmmemberfound then
+			return true
+		else
+			return false
+		end
+	end
+	xrealmmemberfound = false
+	if IsInGroup() then
+		for i=1, n do
+			if UnitExists("party"..i) then
+				local _, realm = UnitName("party"..i)
+				if realm ~= nil and strlen(realm) > 0 then
+					xrealmmemberfound = true
+				end
+			end
+		end
+		if xrealmmemberfound then
+			return true
+		else
+			return false
+		end
+	end
+end
+
+local function ColorfulTime(m)
+	if RCDB.colorize == false then
+		return m
+	end
+	if m > 45 then
+		return "|cffff0000"..m
+	elseif m > 29 then
+		return "|cffffcc00"..m
+	else
+		return m
 	end
 end
 
@@ -669,7 +727,7 @@ end
 
 RC.opt = CreateFrame("Frame", "RC.opt", RC)
 RC.opt:SetWidth(200)
-RC.opt:SetHeight(87)
+RC.opt:SetHeight(159)
 RC.opt:SetPoint("TOPLEFT", RC, "TOPRIGHT", 1, 0)
 RC.opt.texture = RC.opt:CreateTexture(nil,"BACKGROUND", nil, 1)
 RC.opt.texture:SetTexture(0,0,0,0.4)
@@ -730,6 +788,76 @@ function RC.opt.sound.dropdown:SetValue(newValue)
 	PlaySoundFile(SoundsToPlay[newValue], "master")
 end
 
+RC.opt.tomtom = CreateFrame("Frame", "RC.opt.tomtom", RC.opt)
+RC.opt.tomtom:SetWidth(RC.opt:GetWidth() - 8)
+RC.opt.tomtom:SetHeight(20)
+RC.opt.tomtom:SetPoint("TOPLEFT", RC.opt.sound, "BOTTOMLEFT", 0, -4)
+RC.opt.tomtom.texture = RC.opt.tomtom:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.opt.tomtom.texture:SetTexture(0,0,0,0.2)
+RC.opt.tomtom.texture:SetAllPoints(RC.opt.tomtom)
+
+RC.opt.tomtom.status = RC.opt.tomtom:CreateFontString("RC.opt.tomtom.status", nil, "GameFontNormal")
+RC.opt.tomtom.status:SetPoint("LEFT", "RC.opt.tomtom", 28, 0)
+RC.opt.tomtom.status:SetFont("Fonts\\ARIALN.TTF",12)
+RC.opt.tomtom.status:SetTextColor(1,1,1)
+RC.opt.tomtom.status:SetText("TomTom Support")
+
+RC.opt.tomtom.cb = CreateFrame("CheckButton", "RC.opt.tomtom.cb", RC.opt.tomtom, "ChatConfigCheckButtonTemplate");
+RC.opt.tomtom.cb:SetPoint("LEFT", RC.opt.tomtom, 4, 0);
+RC.opt.tomtom.cb.tooltip = "Show a TomTom arrow to the location of a rare mob"
+RC.opt.tomtom.cb:SetScript("OnClick", 
+  function()
+	if RC.opt.tomtom.cb:GetChecked() then
+		RCDB.tomtom = true
+	else
+		RCDB.tomtom = false
+	end
+  end);
+  
+RC.opt.notify = CreateFrame("Frame", "RC.opt.notify", RC.opt)
+RC.opt.notify:SetWidth(RC.opt:GetWidth() - 8)
+RC.opt.notify:SetHeight(20)
+RC.opt.notify:SetPoint("TOPLEFT", RC.opt.tomtom, "BOTTOMLEFT", 0, -4)
+RC.opt.notify.texture = RC.opt.notify:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.opt.notify.texture:SetTexture(0,0,0,0.2)
+RC.opt.notify.texture:SetAllPoints(RC.opt.notify)
+
+RC.opt.notify.status = RC.opt.notify:CreateFontString("RC.opt.notify.status", nil, "GameFontNormal")
+RC.opt.notify.status:SetPoint("LEFT", "RC.opt.notify", 28, 0)
+RC.opt.notify.status:SetFont("Fonts\\ARIALN.TTF",12)
+RC.opt.notify.status:SetTextColor(1,1,1)
+RC.opt.notify.status:SetText("Notification Window")
+
+RC.opt.notify.cb = CreateFrame("CheckButton", "RC.opt.notify.cb", RC.opt.tomtom, "ChatConfigCheckButtonTemplate");
+RC.opt.notify.cb:SetPoint("LEFT", RC.opt.notify, 4, 0);
+RC.opt.notify.cb.tooltip = "Show a notification window if a rare mob is near you"
+RC.opt.notify.cb:SetScript("OnClick", 
+  function()
+	if RC.opt.notify.cb:GetChecked() then
+		RCDB.notify = true
+	else
+		RCDB.notify = false
+	end
+  end);
+  
+RC.opt.colorize = CreateFrame("Frame", "RC.opt.colorize", RC.opt)
+RC.opt.colorize:SetWidth(RC.opt:GetWidth() - 8)
+RC.opt.colorize:SetHeight(20)
+RC.opt.colorize:SetPoint("TOPLEFT", RC.opt.notify, "BOTTOMLEFT", 0, -4)
+RC.opt.colorize.texture = RC.opt.colorize:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.opt.colorize.texture:SetTexture(0,0,0,0.2)
+RC.opt.colorize.texture:SetAllPoints(RC.opt.colorize)
+
+RC.opt.colorize.status = RC.opt.colorize:CreateFontString("RC.opt.colorize.status", nil, "GameFontNormal")
+RC.opt.colorize.status:SetPoint("LEFT", "RC.opt.colorize", 28, 0)
+RC.opt.colorize.status:SetFont("Fonts\\ARIALN.TTF",12)
+RC.opt.colorize.status:SetTextColor(1,1,1)
+RC.opt.colorize.status:SetText("Colorize List")
+
+RC.opt.colorize.cb = CreateFrame("CheckButton", "RC.opt.colorize.cb", RC.opt.tomtom, "ChatConfigCheckButtonTemplate");
+RC.opt.colorize.cb:SetPoint("LEFT", RC.opt.colorize, 4, 0);
+RC.opt.colorize.cb.tooltip = "Colorizes the timers"
+
 RC.opt:Hide()
 
 RC.left.settingsicon:SetScript("OnMouseDown", function (self) OptShowOrHide() end)
@@ -763,6 +891,46 @@ RCminimized.title:SetText("RareCoordinator")
 RCminimized:Hide()
 RCminimized.maximizeicon:SetScript("OnMouseDown", function (self) MinMaximize() end)
 
+RCnotify = CreateFrame("Button", "RCnotify", UIParent, "SecureActionButtonTemplate,SecureHandlerShowHideTemplate")
+RCnotify:SetWidth(200)
+RCnotify:SetHeight(130)
+RCnotify:SetPoint("CENTER", 0, -150)
+RCnotify.texture = RCnotify:CreateTexture(nil,"BACKGROUND", nil, 1)
+RCnotify.texture:SetTexture(0,0,0,0.4)
+RCnotify.texture:SetAllPoints(RCnotify)
+
+RCnotify.model = CreateFrame("PlayerModel", "RCnotify.model", RCnotify)
+RCnotify.model:SetFrameLevel(5)
+RCnotify.model:SetWidth(200)
+RCnotify.model:SetHeight(110)
+RCnotify.model:SetPoint("BOTTOM", "RCnotify", 0, 2)
+RCnotify.model:SetCreature(73158)
+
+RCnotify.name = RCnotify:CreateFontString("RCnotify.name", nil, "GameFontNormal")
+RCnotify.name:SetPoint("TOP", "RCnotify", 0, -2)
+RCnotify.name:SetFont("Fonts\\ARIALN.TTF",15,"OUTLINE")
+RCnotify.name:SetTextColor(1,1,1)
+RCnotify.name:SetText("Champion of the Black Flame")
+
+RCnotify.closeicon = CreateFrame("Button", "RCnotify.closeicon", RCnotify, "UIPanelCloseButton")
+RCnotify.closeicon:SetPoint("TOPLEFT", "RCnotify", 0, 0)
+RCnotify.closeicon:SetWidth(16)
+RCnotify.closeicon:SetHeight(16)
+RCnotify.closeicon.texture = RCnotify.closeicon:CreateTexture(nil, "OVERLAY")
+RCnotify.closeicon.texture:SetTexture([[Interface\AddOns\RareCoordinator\plus.tga]])
+RCnotify.closeicon.texture:SetAllPoints(RCnotify.closeicon)
+RCnotify.closeicon.texture:SetRotation((3*math.pi)/4)
+RCnotify.closeicon:SetScript("OnClick", function (self) RCnotify:Hide() end)
+
+RCnotify.mouseovertexture = RCnotify:CreateTexture(nil,"HIGHLIGHT", nil, 1)
+RCnotify.mouseovertexture:SetTexture(1,1,1,0.1)
+RCnotify.mouseovertexture:SetAllPoints(RCnotify)
+
+RCnotify:SetAttribute( "type", "macro" );
+
+--RCnotify:SetScript("OnMouseDown", function (self) OnMouseDownTarget() end)
+
+RCnotify:Hide()
 
 
 local total = 0
@@ -840,7 +1008,7 @@ local function updateText(self,elapsed)
 						RC:setWaypoint(i)
 					elseif RareSeen[RareIDs[i]] ~= nil then
 						RC.mid.button[i]:Hide()
-						RC.mid.text[i]:SetText(math.floor((time()-RareSeen[RareIDs[i]])/60).."m ago")
+						RC.mid.text[i]:SetText(ColorfulTime(math.floor((time()-RareSeen[RareIDs[i]])/60)).."m")
 					else
 						RC.mid.button[i]:Hide()
 						RC.mid.text[i]:SetText("never")
@@ -855,7 +1023,7 @@ local function updateText(self,elapsed)
 					if RareAliveHP[RareIDs[i]] ~= nil and RareAlive[RareIDs[i]] then
 						RC.right.text[i]:SetText("|cff00ff00"..RareAliveHP[RareIDs[i]].."%|r")
 					elseif RareKilled[RareIDs[i]] ~= nil then
-						RC.right.text[i]:SetText(math.floor((time()-RareKilled[RareIDs[i]])/60).."m ago")
+						RC.right.text[i]:SetText(ColorfulTime(math.floor((time()-RareKilled[RareIDs[i]])/60)).."m")
 					else
 						RC.right.text[i]:SetText("never")
 					end
@@ -866,7 +1034,15 @@ local function updateText(self,elapsed)
     end
 end
 
-
+RC.opt.colorize.cb:SetScript("OnClick", 
+  function()
+	if RC.opt.colorize.cb:GetChecked() then
+		RCDB.colorize = true
+	else
+		RCDB.colorize = false
+	end
+	updateText(RC,100)
+  end);
 
 
 function RC:OnEvent(event, ...)
@@ -882,7 +1058,7 @@ function RC:OnEvent(event, ...)
 	if event == "ADDON_LOADED" then
 		self:OnLoad(...)
 	end
-	if event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_ENTERING_WORLD" then
+	if event == "ZONE_CHANGED_NEW_AREA" or event == "PLAYER_ENTERING_WORLD" or event == "GROUP_ROSTER_UPDATE" then
 		self:ShowOrHide(...)
 	end
 	if event == "CHAT_MSG_ADDON" then
@@ -910,6 +1086,21 @@ function RC:OnLoad(...)
 		if RCDB.sound == nil then
 			RCDB.sound = "DIIING"
 		end
+		
+		if RCDB.tomtom == nil then
+			RCDB.tomtom = true
+		end
+		RC.opt.tomtom.cb:SetChecked(RCDB.tomtom)
+		
+		if RCDB.notify == nil then
+			RCDB.notify = true
+		end
+		RC.opt.notify.cb:SetChecked(RCDB.notify)
+		
+		if RCDB.colorize == nil then
+			RCDB.colorize = true
+		end
+		RC.opt.colorize.cb:SetChecked(RCDB.colorize)
 	end
 end
 
@@ -940,23 +1131,39 @@ end
 
 --894
 function RC:ShowOrHide(...)
-	local zone = GetZoneText()
-	if GetCurrentMapAreaID() == 951 then
-		RareAlive = {}
-		self:Show()
-		myChan = false
-		needStatus = true
-		chanchecked = 0
-		self:SetScript("OnUpdate", RC.join)
-		self:RegisterEvent("UNIT_HEALTH")
-		RegisterAddonMessagePrefix("RCELVA")
-	else
+	if IsInXRealmGrp() then
 		self:Hide()
+		RCminimized:Hide()
 		LeaveChannelByName("RCELVA")
 		self:UnregisterEvent("UNIT_HEALTH")
+		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+	else
+		if GetCurrentMapAreaID() == 951 then
+			RareAlive = {}
+			if minimized then
+				RCminimized:Show()
+			else
+				self:Show()
+			end
+			myChan = false
+			needStatus = true
+			chanchecked = 0
+			self:SetScript("OnUpdate", RC.join)
+			self:RegisterEvent("UNIT_HEALTH")
+			self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+			self:RegisterEvent("PLAYER_TARGET_CHANGED")
+			RegisterAddonMessagePrefix("RCELVA")
+		else
+			self:Hide()
+			RCminimized:Hide()
+			LeaveChannelByName("RCELVA")
+			self:UnregisterEvent("UNIT_HEALTH")
+			self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+			self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+		end
 	end
 end
-
 
 
 
@@ -1166,6 +1373,12 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 			end
 		end
 	end
+	for _,v in pairs(RareIDs) do
+		local npcID = tonumber(destGUID:sub(6, 10), 16)
+		if v == npcID then
+			self:Notify(npcID)
+		end
+	end
 end
 
 function RC:ChanRosterUpdate(id)
@@ -1185,6 +1398,7 @@ function RC:ChanRosterUpdate(id)
 				if owner then
 					--print(name .." is the owner right now")
 					SendAddonMessage("RCELVA", "GetStatus", "WHISPER", name)
+					print("Requesting update from "..name)
 					updateText(self, 100)
 				end
 			end
@@ -1352,9 +1566,17 @@ local function LockOrUnlock()
 end
 
 
-function RC:DebugMsg(msg)
-	print(msg)
-		
+function RC:Notify(id)
+	if RCDB.notify then
+		if RareNotified[id] == nil or time()-RareNotified[id] > 10*60 then
+			RCnotify.model:SetCreature(id)
+			RCnotify.name:SetText(self:getLocalRareName(id))
+			--RCnotify:SetScript("OnMouseDown", function (self) OnMouseDownTarget() end)
+			RCnotify:SetAttribute( "macrotext", "/cleartarget\n/targetexact ".. self:getLocalRareName(id));
+			RCnotify:Show()
+			RareNotified[id] = time()
+		end
+	end
 end
 
 
@@ -1377,14 +1599,13 @@ RC:SetScript("OnEvent", RC.OnEvent)
 --		RC:SetScript("OnUpdate", RC.join)
 		
 		
-RC:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 RC:RegisterEvent("ADDON_LOADED")
-RC:RegisterEvent("PLAYER_TARGET_CHANGED")
 RC:RegisterEvent("CHAT_MSG_CHANNEL")
 RC:RegisterEvent("CHAT_MSG_ADDON")
 RC:RegisterEvent("PLAYER_ENTERING_WORLD")
 RC:RegisterEvent("ZONE_CHANGED_NEW_AREA")
 RC:RegisterEvent("CHANNEL_ROSTER_UPDATE")
+RC:RegisterEvent("GROUP_ROSTER_UPDATE")
 
 
 RC.opt.locked.button:SetScript("OnClick", function(self) LockOrUnlock() end)
