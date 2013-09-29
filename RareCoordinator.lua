@@ -1398,7 +1398,7 @@ function RC:ChanRosterUpdate(id)
 				if owner then
 					--print(name .." is the owner right now")
 					SendAddonMessage("RCELVA", "GetStatus", "WHISPER", name)
-					print("Requesting update from "..name)
+					--print("Requesting update from "..name)
 					updateText(self, 100)
 				end
 			end
