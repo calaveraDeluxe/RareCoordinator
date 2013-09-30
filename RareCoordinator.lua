@@ -395,6 +395,12 @@ local SoundsToPlay = {}
 SoundsToPlay['none'] = ""
 SoundsToPlay['DIIING'] = "sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg"
 SoundsToPlay['You are not prepared!'] = "sound\\Creature\\Illidan\\BLACK_Illidan_04.wav"
+SoundsToPlay['Plaaaytime'] = "Sound\\Creature\\Meathook\\CS_Meathook_Spawn.wav"
+SoundsToPlay['Intruder alert'] = "Sound\\Creature\\MobileAlertBot\\MobileAlertBotIntruderAlert01.wav"
+SoundsToPlay['BG win soon'] = "Sound\\Interface\\PVPWarningHordeMono.wav"
+SoundsToPlay['Flag taken'] = "Sound\\Interface\\PVPFlagTakenMono.wav"
+SoundsToPlay['Raid Warning'] = "Sound\\interface\\RaidWarning.wav"
+SoundsToPlay['Calm drums'] = "Sound\\interface\\ReadyCheck.wav"
 
 
 local RareSeen = {}
