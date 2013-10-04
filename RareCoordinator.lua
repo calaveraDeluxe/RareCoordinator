@@ -5,8 +5,13 @@ local function onDragStart(self) self:StartMoving() end
 
 local function onDragStop(self)
 	self:StopMovingOrSizing()
-	RCDB.x = self:GetLeft()
-	RCDB.y = self:GetTop()
+	if self:GetName() == "RC" then
+		RCDB.x = self:GetLeft()
+		RCDB.y = self:GetTop()
+	elseif self:GetName() == "RCnotify" then
+		RCDB.notifyx = self:GetLeft()
+		RCDB.notifyy = self:GetTop()
+	end
 end
 
 local function OnDragHandleMouseDown(self) self.frame:StartSizing("BOTTOMRIGHT") end
@@ -17,7 +22,9 @@ local function onResize(self, width, height)
 	height = width*1.74
 	RCDB.width = width
 	RCDB.height = height
-	self:SetHeight(height)
+	if self:GetName() == "RC" then
+		self:SetHeight(height)
+	end
 	
 	RCminimized:SetWidth(self:GetWidth())
 	
@@ -900,23 +907,20 @@ RCminimized.maximizeicon:SetScript("OnMouseDown", function (self) MinMaximize() 
 RCnotify = CreateFrame("Button", "RCnotify", UIParent, "SecureActionButtonTemplate,SecureHandlerShowHideTemplate")
 RCnotify:SetWidth(200)
 RCnotify:SetHeight(130)
-RCnotify:SetPoint("CENTER", 0, -150)
 RCnotify.texture = RCnotify:CreateTexture(nil,"BACKGROUND", nil, 1)
 RCnotify.texture:SetTexture(0,0,0,0.4)
 RCnotify.texture:SetAllPoints(RCnotify)
 
 RCnotify.model = CreateFrame("PlayerModel", "RCnotify.model", RCnotify)
 RCnotify.model:SetFrameLevel(5)
+RCnotify.model:SetPoint("BOTTOM", "RCnotify", 0, 2)
 RCnotify.model:SetWidth(200)
 RCnotify.model:SetHeight(110)
-RCnotify.model:SetPoint("BOTTOM", "RCnotify", 0, 2)
-RCnotify.model:SetCreature(73158)
 
 RCnotify.name = RCnotify:CreateFontString("RCnotify.name", nil, "GameFontNormal")
 RCnotify.name:SetPoint("TOP", "RCnotify", 0, -2)
 RCnotify.name:SetFont("Fonts\\ARIALN.TTF",15,"OUTLINE")
 RCnotify.name:SetTextColor(1,1,1)
-RCnotify.name:SetText("Champion of the Black Flame")
 
 RCnotify.closeicon = CreateFrame("Button", "RCnotify.closeicon", RCnotify, "UIPanelCloseButton")
 RCnotify.closeicon:SetPoint("TOPLEFT", "RCnotify", 0, 0)
@@ -1082,13 +1086,20 @@ function RC:OnLoad(...)
 	if select(1, ...) == "RareCoordinator" then
 		print("RareCoordinator loaded - type /rc or /rare for options");
 		if RCDB.x == nil or RCDB.y == nil then
-			self:SetPoint("CENTER",0,0)
+			self:SetPoint("CENTER",-200,0)
 		else
 			self:ClearAllPoints()
 			self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", RCDB.x, RCDB.y)
 			self:SetWidth(RCDB.width)
 			onResize(RC, RC:GetWidth(), 0)
 		end
+		if RCDB.notifyx == nil or RCDB.notifyy == nil then
+			RCnotify:SetPoint("CENTER", 0, -150)
+		else
+			RCnotify:ClearAllPoints()
+			RCnotify:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", RCDB.notifyx, RCDB.notifyy)
+		end
+		
 		if RCDB.sound == nil then
 			RCDB.sound = "DIIING"
 		end
@@ -1135,7 +1146,7 @@ function RC:UnitHealth(unit)
 	end
 end
 
---894
+--894 / 888
 function RC:ShowOrHide(...)
 	if IsInXRealmGrp() then
 		self:Hide()
@@ -1547,6 +1558,17 @@ local function LockOrUnlock()
 		RC:Show()
 		RC.res:Show()
 		
+		RCnotify:EnableMouse(true)
+		RCnotify:SetMovable(true)
+		RCnotify:SetResizable(true)
+		RCnotify:SetScript("OnSizeChanged", onResize)
+		RCnotify:SetScript("OnDragStart", onDragStart)
+		RCnotify:SetScript("OnDragStop", onDragStop)
+		RCnotify:RegisterForDrag("LeftButton")
+		RCnotify.model:SetUnit("player")
+		RCnotify.name:SetText("Player")
+		RCnotify:Show()
+		
 		RC.opt.locked.status:SetText("Frame is |cff00ff00unlocked")
 		RC.opt.locked.button:SetText("lock")
 		
@@ -1563,6 +1585,15 @@ local function LockOrUnlock()
 		RC:SetScript("OnHide", nil)
 		RC:ShowOrHide()
 		RC.res:Hide()
+		
+		RCnotify:SetMovable(false)
+		RCnotify:EnableMouse(false)
+		RCnotify:SetResizable(false)
+		RCnotify:RegisterForDrag()
+		RCnotify:SetScript("OnDragStart", nil)
+		RCnotify:SetScript("OnDragStop", nil)
+		RCnotify:SetScript("OnHide", nil)
+		RCnotify:Hide()
 		
 		RC.opt.locked.status:SetText("Frame is |cffff0000locked")
 		RC.opt.locked.button:SetText("unlock")
