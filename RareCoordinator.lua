@@ -548,15 +548,15 @@ end
 
 
 local function OnMouseDownAnnounce(id)
-	if RareAnnounced[RareIDs[id]] == nil then
-		if RareAliveHP[RareIDs[id]] == nil then
-			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(RareIDs[id])..": "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
+	if RareAnnounced[id] == nil then
+		if RareAliveHP[id] == nil then
+			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(id)..": "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
 		else
-			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(RareIDs[id]).."("..RareAliveHP[RareIDs[id]].."%): "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
+			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(id).."("..RareAliveHP[id].."%): "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
 		end
-		SendChatMessage("[RCELVA]"..RC.version.."_"..RareIDs[id].."_announce_"..time().."_", "CHANNEL", nil, RC:getChanID(GetChannelList()))
-		RareAnnounced[RareIDs[id]] = time()
-		RareAnnouncedSelf[RareIDs[id]] = time()
+		SendChatMessage("[RCELVA]"..RC.version.."_"..id.."_announce_"..time().."_", "CHANNEL", nil, RC:getChanID(GetChannelList()))
+		RareAnnounced[id] = time()
+		RareAnnouncedSelf[id] = time()
 	end
 end
 
@@ -650,17 +650,19 @@ end
 
 local function ColorfulTime(m)
 	if RCDB.colorize == false then
-		return m
+		return m.."m"
 	end
 	
 	if m > 45 then
-		return "|cffff0000"..m
+		return "|cffff0000"..m.."m"
+	elseif m < 0 then
+		return "-"
 	elseif m < 25 then
-		return m
+		return m.."m"
 	else
 		local color = num2hex(204/20*(45-m))
 		if strlen(color) == 1 then color = "0"..color end
-		return "|cffff"..color.."00"..m
+		return "|cffff"..color.."00"..m.."m"
 		--return m
 	end
 end
@@ -1132,8 +1134,11 @@ local function updateText(self,elapsed)
 							RC.mid.text[k]:SetText("-")
 						else
 							RC.mid.button[k]:Hide()
-							RC.mid.text[k]:SetText(ColorfulTime(math.floor((time()-v.t)/60)).."m")
+							RC.mid.text[k]:SetText(ColorfulTime(math.floor((time()-v.t)/60)))
 						end
+					end
+					if RC.mid.button ~= nil then
+						RC.mid.button[k]:SetScript("OnMouseDown", function (self) OnMouseDownAnnounce(v.id) end)
 					end
 				end
 			end
@@ -1188,8 +1193,13 @@ local function updateText(self,elapsed)
 							RC.mid.text[i]:SetText("-")
 						else
 							RC.mid.button[i]:Hide()
-							RC.mid.text[i]:SetText(ColorfulTime(math.floor((time()-t)/60)).."m")
+							RC.mid.text[i]:SetText(ColorfulTime(math.floor((time()-t)/60)))
 						end
+					end
+				end
+				for i=1,table.getn(RC.mid.button) do
+					if RC.mid.button ~= nil then
+						RC.mid.button[i]:SetScript("OnMouseDown", function (self) OnMouseDownAnnounce(RareIDs[i]) end)
 					end
 				end
 			end
@@ -1200,7 +1210,7 @@ local function updateText(self,elapsed)
 						if RareAliveHP[RareIDs[i]] ~= nil and RareAlive[RareIDs[i]] then
 							RC.right.text[i]:SetText("|cff00ff00"..RareAliveHP[RareIDs[i]].."%|r")
 						elseif RareKilled[RareIDs[i]] ~= nil then
-							RC.right.text[i]:SetText(ColorfulTime(math.floor((time()-RareKilled[RareIDs[i]])/60)).."m")
+							RC.right.text[i]:SetText(ColorfulTime(math.floor((time()-RareKilled[RareIDs[i]])/60)))
 						else
 							RC.right.text[i]:SetText("never")
 						end
