@@ -18,23 +18,29 @@ local function OnDragHandleMouseDown(self) self.frame:StartSizing("BOTTOMRIGHT")
 
 local function OnDragHandleMouseUp(self, button) self.frame:StopMovingOrSizing() end
 
-local function onResize(self, width, height)
-	height = width*1.74
+function onResize(self, width, height)
+	local scale = width/260
+	
+	if self.RareCount ~= nil then
+		height = self.RareCount*16.25*scale
+	else
+		height = 300
+	end
 	RCDB.width = width
 	RCDB.height = height
+	
 	if self:GetName() == "RC" then
 		self:SetHeight(height)
 	end
 	
 	RCminimized:SetWidth(self:GetWidth())
 	
-	local scale = width/300
 	
 	
 	if self.left ~= nil then 
 		self.left:SetPoint("TOPLEFT", self, 4*scale, -5*scale)
 		self.left:SetHeight(height-9*scale)
-		self.left:SetWidth(width/20*12)
+		self.left:SetWidth(width/20*15)
 		if self.left.text ~= nil then
 			local i
 			for i=0,table.getn(self.left.text) do
@@ -80,7 +86,7 @@ local function onResize(self, width, height)
 	end
 	if self.mid ~= nil then
 		self.mid:SetHeight(height-9*scale)
-		self.mid:SetWidth(width/20*4-6*scale)
+		self.mid:SetWidth(width/20*4+4*scale)
 		self.mid:SetPoint("TOPLEFT", self.left, "TOPRIGHT", 2*scale, 0)
 		if self.mid.text ~= nil then
 			local i
@@ -247,7 +253,7 @@ RareNamesLocalized['enUS'][73282] = "Garnia"
 RareNamesLocalized['enUS'][72970] = "Golganarr"
 RareNamesLocalized['enUS'][73161] = "Great Turtle Furyshell"
 RareNamesLocalized['enUS'][72909] = "Gu'chi the Swarmbringer"
-RareNamesLocalized['enUS'][73167] = "Huolon "
+RareNamesLocalized['enUS'][73167] = "Huolon"
 RareNamesLocalized['enUS'][73163] = "Imperial Python"
 RareNamesLocalized['enUS'][73160] = "Ironfur Steelhorn"
 RareNamesLocalized['enUS'][73169] = "Jakur of Ordon"
@@ -436,7 +442,7 @@ local needStatus = false
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
 RC.version = "5.4.0-7"
-
+RC.RareCount = #RareIDs
 
 function RC:getLocalRareName(id)
 	if RareNamesLocalized[GetLocale()] ~= nil then
@@ -482,6 +488,59 @@ function RC:setWaypoint(id)
 		end
 	end
 end
+
+function RC:getRelevantRareTime(id)
+	if RareAlive[id] ~= nil then
+		return 0
+	end
+	if RareSeen[id] == nil and RareKilled[id] == nil then
+		return time()
+	end
+	if RareSeen[id] ~= nil and RareKilled[id] == nil then
+		return RareSeen[id]
+	end
+	if RareSeen[id] == nil and RareKilled[id] ~= nil then
+		return RareKilled[id]
+	end
+	if tonumber(RareSeen[id])-tonumber(RareKilled[id]) > 30*60 then
+		return RareSeen[id]
+	end
+	return RareKilled[id]
+end
+
+function RC:getRealRareTime(id)
+	if RareAlive[id] ~= nil then
+		return true
+	end
+	if RareSeen[id] == nil and RareKilled[id] == nil then
+		return false
+	end
+	if RareSeen[id] ~= nil and RareKilled[id] == nil then
+		return RareSeen[id]
+	end
+	if RareSeen[id] == nil and RareKilled[id] ~= nil then
+		return RareKilled[id]
+	end
+	if tonumber(RareSeen[id])-tonumber(RareKilled[id]) > 30*60 then
+		return RareSeen[id]
+	end
+	return RareKilled[id]
+end
+
+
+function RC:createSortedTable()
+	local sorted = {}
+	local i
+	for i=1, #RareIDs do
+		sorted[i] = {id=RareIDs[i], t=tonumber(self:getRelevantRareTime(RareIDs[i]))}
+	end
+	sort(sorted, function(a,b) return a.t<b.t end)
+	--for k,v in pairs(sorted) do
+	--	print(self:getLocalRareName(v.id).."-"..(time()-v.t)/60)
+	--end
+	return sorted
+end
+
 
 local function OnMouseDownAnnounce(id)
 	if RareAnnounced[RareIDs[id]] == nil then
@@ -605,20 +664,20 @@ RC.left.texture:SetTexture(0,0,0,0.2)
 RC.left.texture:SetAllPoints(RC.left)
 
 RC.mid = CreateFrame("Frame", "RC.mid", RC)
-RC.mid:SetWidth(80)
+RC.mid:SetWidth(100)
 RC.mid:SetHeight(RC:GetHeight()-9)
 RC.mid:SetPoint("TOPLEFT", RC.left, "TOPRIGHT", 2, 0)
 RC.mid.texture = RC:CreateTexture(nil,"BACKGROUND", nil, 1)
 RC.mid.texture:SetTexture(0,0,0,0.2)
 RC.mid.texture:SetAllPoints(RC.mid)
 
-RC.right = CreateFrame("Frame", "RC.right", RC)
-RC.right:SetWidth(80)
-RC.right:SetHeight(RC:GetHeight()-9)
-RC.right:SetPoint("TOPLEFT", RC.mid, "TOPRIGHT", 2, 0)
-RC.right.texture = RC:CreateTexture(nil,"BACKGROUND", nil, 1)
-RC.right.texture:SetTexture(0,0,0,0.2)
-RC.right.texture:SetAllPoints(RC.right)
+--RC.right = CreateFrame("Frame", "RC.right", RC)
+--RC.right:SetWidth(80)
+--RC.right:SetHeight(RC:GetHeight()-9)
+--RC.right:SetPoint("TOPLEFT", RC.mid, "TOPRIGHT", 2, 0)
+--RC.right.texture = RC:CreateTexture(nil,"BACKGROUND", nil, 1)
+--RC.right.texture:SetTexture(0,0,0,0.2)
+--RC.right.texture:SetAllPoints(RC.right)
 
 RC.res = CreateFrame("Frame", "RC.res", RC)
 RC.res.frame = RC
@@ -721,26 +780,26 @@ for i=0, #RareIDs do
 	RC.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
 	RC.mid.text[i]:SetTextColor(1,1,1)
 	if i == 0 then
-		RC.mid.text[i]:SetText("Seen")
+		RC.mid.text[i]:SetText("Time")
 		RC.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
 	end
 end
-RC.right.text = {}
-local i
-for i=0, #RareIDs do
-	RC.right.text[i] = RC.right:CreateFontString("RC.right.text["..i.."]", nil, "GameFontNormal")
-	RC.right.text[i]:SetPoint("TOP", "RC.right", 2, -2 + -14.5*i)
-	RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
-	RC.right.text[i]:SetTextColor(1,1,1)
-	if i == 0 then
-		RC.right.text[i]:SetText("Killed")
-		RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
-	end
-end
+--RC.right.text = {}
+--local i
+--for i=0, #RareIDs do
+--	RC.right.text[i] = RC.right:CreateFontString("RC.right.text["..i.."]", nil, "GameFontNormal")
+--	RC.right.text[i]:SetPoint("TOP", "RC.right", 2, -2 + -14.5*i)
+--	RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12)
+--	RC.right.text[i]:SetTextColor(1,1,1)
+--	if i == 0 then
+--		RC.right.text[i]:SetText("Killed")
+--		RC.right.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
+--	end
+--end
 
 RC.opt = CreateFrame("Frame", "RC.opt", RC)
 RC.opt:SetWidth(200)
-RC.opt:SetHeight(159)
+RC.opt:SetHeight(184)
 RC.opt:SetPoint("TOPLEFT", RC, "TOPRIGHT", 1, 0)
 RC.opt.texture = RC.opt:CreateTexture(nil,"BACKGROUND", nil, 1)
 RC.opt.texture:SetTexture(0,0,0,0.4)
@@ -869,7 +928,27 @@ RC.opt.colorize.status:SetText("Colorize List")
 
 RC.opt.colorize.cb = CreateFrame("CheckButton", "RC.opt.colorize.cb", RC.opt.tomtom, "ChatConfigCheckButtonTemplate");
 RC.opt.colorize.cb:SetPoint("LEFT", RC.opt.colorize, 4, 0);
-RC.opt.colorize.cb.tooltip = "Colorizes the timers"
+RC.opt.colorize.cb.tooltip = "Colorizes the timers"  
+
+RC.opt.sort = CreateFrame("Frame", "RC.opt.sort", RC.opt)
+RC.opt.sort:SetWidth(RC.opt:GetWidth() - 8)
+RC.opt.sort:SetHeight(20)
+RC.opt.sort:SetPoint("TOPLEFT", RC.opt.colorize, "BOTTOMLEFT", 0, -4)
+RC.opt.sort.texture = RC.opt.sort:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.opt.sort.texture:SetTexture(0,0,0,0.2)
+RC.opt.sort.texture:SetAllPoints(RC.opt.sort)
+
+RC.opt.sort.status = RC.opt.sort:CreateFontString("RC.opt.sort.status", nil, "GameFontNormal")
+RC.opt.sort.status:SetPoint("LEFT", "RC.opt.sort", 28, 0)
+RC.opt.sort.status:SetFont("Fonts\\ARIALN.TTF",12)
+RC.opt.sort.status:SetTextColor(1,1,1)
+RC.opt.sort.status:SetText("Sort list by timers")
+
+RC.opt.sort.cb = CreateFrame("CheckButton", "RC.opt.sort.cb", RC.opt.tomtom, "ChatConfigCheckButtonTemplate");
+RC.opt.sort.cb:SetPoint("LEFT", RC.opt.sort, 4, 0);
+RC.opt.sort.cb.tooltip = "Sorts the list by timers/alphabetically"
+
+
 
 RC.opt:Hide()
 
@@ -987,55 +1066,116 @@ local function updateText(self,elapsed)
 				RareAliveHP[k] = nil
 			end
 		end
-		if RC.left ~= nil then
-			if RC.left.icon ~= nil then
-				local i
-				for i=1,table.getn(RC.left.icon) do
-					if RareAv[RareIDs[i]] ~= nil then
-						if RareAv[RareIDs[i]] then
-							RC.left.icon[i].texture:SetTexture([[Interface\AddOns\RareCoordinator\green.tga]])
+		if RCDB.sort then
+			local sorted = RC:createSortedTable()
+			for k,v in pairs(sorted) do
+				if RC.left ~= nil then
+					if RC.left.text ~= nil then
+						RC.left.text[k]:SetText(RC:getLocalRareName(v.id))
+					end
+					if RC.left.icon ~= nil then
+						if RareAv[v.id] ~= nil then
+							if RareAv[v.id] then
+								RC.left.icon[k].texture:SetTexture([[Interface\AddOns\RareCoordinator\green.tga]])
+							else
+								RC.left.icon[k].texture:SetTexture([[Interface\AddOns\RareCoordinator\red.tga]])
+							end
 						else
-							RC.left.icon[i].texture:SetTexture([[Interface\AddOns\RareCoordinator\red.tga]])
+							RC.left.icon[k].texture:SetTexture(nil)
+						end
+					end
+				end
+				
+				
+				if RC.mid ~= nil then
+					if RC.mid.text ~= nil then
+						local t = RC:getRealRareTime(v.id)
+						if t == true then --alive
+							if SoundPlayed[v.id] == nil then
+								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								SoundPlayed[v.id] = time()
+							elseif time() > SoundPlayed[v.id] + 600 then
+								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								SoundPlayed[v.id] = time()
+							end
+							RC.mid.button[k]:Show()
+							if RareAliveHP[v.id] ~= nil then
+								RC.mid.text[k]:SetText("|cff00ff00"..RareAliveHP[v.id].."%|r")
+							else
+								RC.mid.text[k]:SetText("|cff00ff00alive|r")
+							end
+						elseif t == false then --nodata
+							RC.mid.button[k]:Hide()
+							RC.mid.text[k]:SetText("-")
+						else
+							RC.mid.button[k]:Hide()
+							RC.mid.text[k]:SetText(ColorfulTime(math.floor((time()-v.t)/60)).."m")
 						end
 					end
 				end
 			end
-		end
-		if RC.mid ~= nil then
-			if RC.mid.text ~= nil then
-				local i
-				for i=1,table.getn(RC.mid.text) do
-					if RareAlive[RareIDs[i]] ~= nil then
-						if SoundPlayed[RareIDs[i]] == nil then
-							PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
-							SoundPlayed[RareIDs[i]] = time()
-						elseif time() > SoundPlayed[RareIDs[i]] + 600 then
-							PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
-							SoundPlayed[RareIDs[i]] = time()
+			
+			
+		else
+			if RC.left ~= nil then
+			
+				if RC.left.text ~= nil then
+					for i=1,table.getn(RC.left.icon) do
+						RC.left.text[i]:SetText(RC:getLocalRareName(RareIDs[i]))
+					end
+				end
+					
+				if RC.left.icon ~= nil then
+					local i
+					for i=1,table.getn(RC.left.icon) do
+						if RareAv[RareIDs[i]] ~= nil then
+							if RareAv[RareIDs[i]] then
+								RC.left.icon[i].texture:SetTexture([[Interface\AddOns\RareCoordinator\green.tga]])
+							else
+								RC.left.icon[i].texture:SetTexture([[Interface\AddOns\RareCoordinator\red.tga]])
+							end
+						else
+							RC.left.icon[i].texture:SetTexture(nil)
 						end
-						RC.mid.button[i]:Show()
-						RC.mid.text[i]:SetText("|cff00ff00alive|r")
-						RC:setWaypoint(i)
-					elseif RareSeen[RareIDs[i]] ~= nil then
-						RC.mid.button[i]:Hide()
-						RC.mid.text[i]:SetText(ColorfulTime(math.floor((time()-RareSeen[RareIDs[i]])/60)).."m")
-					else
-						RC.mid.button[i]:Hide()
-						RC.mid.text[i]:SetText("never")
 					end
 				end
 			end
-		end
-		if RC.right ~= nil then
-			if RC.right.text ~= nil then
-				local i
-				for i=1,table.getn(RC.right.text) do
-					if RareAliveHP[RareIDs[i]] ~= nil and RareAlive[RareIDs[i]] then
-						RC.right.text[i]:SetText("|cff00ff00"..RareAliveHP[RareIDs[i]].."%|r")
-					elseif RareKilled[RareIDs[i]] ~= nil then
-						RC.right.text[i]:SetText(ColorfulTime(math.floor((time()-RareKilled[RareIDs[i]])/60)).."m")
-					else
-						RC.right.text[i]:SetText("never")
+			if RC.mid ~= nil then
+				if RC.mid.text ~= nil then
+					local i
+					for i=1,table.getn(RC.mid.text) do
+						if RareAlive[RareIDs[i]] ~= nil then
+							if SoundPlayed[RareIDs[i]] == nil then
+								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								SoundPlayed[RareIDs[i]] = time()
+							elseif time() > SoundPlayed[RareIDs[i]] + 600 then
+								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								SoundPlayed[RareIDs[i]] = time()
+							end
+							RC.mid.button[i]:Show()
+							RC.mid.text[i]:SetText("|cff00ff00alive|r")
+							RC:setWaypoint(i)
+						elseif RareSeen[RareIDs[i]] ~= nil then
+							RC.mid.button[i]:Hide()
+							RC.mid.text[i]:SetText(ColorfulTime(math.floor((time()-RareSeen[RareIDs[i]])/60)).."m")
+						else
+							RC.mid.button[i]:Hide()
+							RC.mid.text[i]:SetText("never")
+						end
+					end
+				end
+			end
+			if RC.right ~= nil then
+				if RC.right.text ~= nil then
+					local i
+					for i=1,table.getn(RC.right.text) do
+						if RareAliveHP[RareIDs[i]] ~= nil and RareAlive[RareIDs[i]] then
+							RC.right.text[i]:SetText("|cff00ff00"..RareAliveHP[RareIDs[i]].."%|r")
+						elseif RareKilled[RareIDs[i]] ~= nil then
+							RC.right.text[i]:SetText(ColorfulTime(math.floor((time()-RareKilled[RareIDs[i]])/60)).."m")
+						else
+							RC.right.text[i]:SetText("never")
+						end
 					end
 				end
 			end
@@ -1054,7 +1194,17 @@ RC.opt.colorize.cb:SetScript("OnClick",
 	updateText(RC,100)
   end);
 
-
+RC.opt.sort.cb:SetScript("OnClick", 
+  function()
+	if RC.opt.sort.cb:GetChecked() then
+		RCDB.sort = true
+	else
+		RCDB.sort = false
+	end
+	updateText(RC,100)
+	onResize(RC, RC:GetWidth(), 0, RareIDs)
+  end);
+  
 function RC:OnEvent(event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		self:CombatLog(...)
@@ -1091,7 +1241,7 @@ function RC:OnLoad(...)
 			self:ClearAllPoints()
 			self:SetPoint("TOPLEFT", UIParent, "BOTTOMLEFT", RCDB.x, RCDB.y)
 			self:SetWidth(RCDB.width)
-			onResize(RC, RC:GetWidth(), 0)
+			onResize(RC, RC:GetWidth(), 0, RareIDs)
 		end
 		if RCDB.notifyx == nil or RCDB.notifyy == nil then
 			RCnotify:SetPoint("CENTER", 0, -150)
@@ -1118,6 +1268,11 @@ function RC:OnLoad(...)
 			RCDB.colorize = true
 		end
 		RC.opt.colorize.cb:SetChecked(RCDB.colorize)
+		
+		if RCDB.sort == nil then
+			RCDB.sort = true
+		end
+		RC.opt.sort.cb:SetChecked(RCDB.sort)
 	end
 end
 
@@ -1156,7 +1311,7 @@ function RC:ShowOrHide(...)
 		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
 	else
-		if GetCurrentMapAreaID() == 951 then
+		if GetCurrentMapAreaID() == 951 or GetCurrentMapAreaID() == 888 then
 			RareAlive = {}
 			if minimized then
 				RCminimized:Show()
@@ -1558,9 +1713,9 @@ local function LockOrUnlock()
 		RC:Show()
 		RC.res:Show()
 		
-		RCnotify:EnableMouse(true)
+		--RCnotify:EnableMouse(true)
 		RCnotify:SetMovable(true)
-		RCnotify:SetResizable(true)
+		--RCnotify:SetResizable(true)
 		RCnotify:SetScript("OnSizeChanged", onResize)
 		RCnotify:SetScript("OnDragStart", onDragStart)
 		RCnotify:SetScript("OnDragStop", onDragStop)
@@ -1587,8 +1742,8 @@ local function LockOrUnlock()
 		RC.res:Hide()
 		
 		RCnotify:SetMovable(false)
-		RCnotify:EnableMouse(false)
-		RCnotify:SetResizable(false)
+		--RCnotify:EnableMouse(false)
+		--RCnotify:SetResizable(false)
 		RCnotify:RegisterForDrag()
 		RCnotify:SetScript("OnDragStart", nil)
 		RCnotify:SetScript("OnDragStop", nil)
@@ -1648,5 +1803,5 @@ RC:RegisterEvent("GROUP_ROSTER_UPDATE")
 RC.opt.locked.button:SetScript("OnClick", function(self) LockOrUnlock() end)
 
 updateText(RC, 100)
-onResize(RC, RC:GetWidth(), 0)
+onResize(RC, RC:GetWidth(), 0, RareIDs)
 RC:Show()
