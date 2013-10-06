@@ -8,6 +8,9 @@ local function onDragStop(self)
 	if self:GetName() == "RC" then
 		RCDB.x = self:GetLeft()
 		RCDB.y = self:GetTop()
+			
+		RCDB.width = self:GetWidth()
+		RCDB.height = self:GetHeight()
 	elseif self:GetName() == "RCnotify" then
 		RCDB.notifyx = self:GetLeft()
 		RCDB.notifyy = self:GetTop()
@@ -21,13 +24,15 @@ local function OnDragHandleMouseUp(self, button) self.frame:StopMovingOrSizing()
 function onResize(self, width, height)
 	local scale = width/260
 	
+	RCDB.width = width
+	RCDB.height = height
+	
 	if self.RareCount ~= nil then
 		height = self.RareCount*16.25*scale
+		RCDB.height = height
 	else
 		height = 300
 	end
-	RCDB.width = width
-	RCDB.height = height
 	
 	if self:GetName() == "RC" then
 		self:SetHeight(height)
@@ -502,7 +507,7 @@ function RC:getRelevantRareTime(id)
 	if RareSeen[id] == nil and RareKilled[id] ~= nil then
 		return RareKilled[id]
 	end
-	if tonumber(RareSeen[id])-tonumber(RareKilled[id]) > 30*60 then
+	if tonumber(RareSeen[id])-tonumber(RareKilled[id]) > 33*60 then
 		return RareSeen[id]
 	end
 	return RareKilled[id]
@@ -629,16 +634,34 @@ local function IsInXRealmGrp()
 	end
 end
 
+--- Returns HEX representation of num
+--- credits to http://snipplr.com/view/13086/
+function num2hex(num)
+	local hexstr = '0123456789abcdef'
+	local s = ''
+	while num > 0 do
+		local mod = math.fmod(num, 16)
+		s = string.sub(hexstr, mod+1, mod+1) .. s
+		num = math.floor(num / 16)
+	end
+	if s == '' then s = '0' end
+	return s
+end
+
 local function ColorfulTime(m)
 	if RCDB.colorize == false then
 		return m
 	end
+	
 	if m > 45 then
 		return "|cffff0000"..m
-	elseif m > 29 then
-		return "|cffffcc00"..m
-	else
+	elseif m < 25 then
 		return m
+	else
+		local color = num2hex(204/20*(45-m))
+		if strlen(color) == 1 then color = "0"..color end
+		return "|cffff"..color.."00"..m
+		--return m
 	end
 end
 
