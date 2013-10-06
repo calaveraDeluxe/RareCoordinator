@@ -1144,7 +1144,8 @@ local function updateText(self,elapsed)
 				if RC.mid.text ~= nil then
 					local i
 					for i=1,table.getn(RC.mid.text) do
-						if RareAlive[RareIDs[i]] ~= nil then
+						local t=RC:getRealRareTime(RareIDs[i])
+						if t == true then
 							if SoundPlayed[RareIDs[i]] == nil then
 								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
 								SoundPlayed[RareIDs[i]] = time()
@@ -1153,14 +1154,18 @@ local function updateText(self,elapsed)
 								SoundPlayed[RareIDs[i]] = time()
 							end
 							RC.mid.button[i]:Show()
-							RC.mid.text[i]:SetText("|cff00ff00alive|r")
+							if RareAliveHP[RareIDs[i]] ~= nil then
+								RC.mid.text[i]:SetText("|cff00ff00"..RareAliveHP[RareIDs[i]].."%|r")
+							else
+								RC.mid.text[i]:SetText("|cff00ff00alive|r")
+							end
 							RC:setWaypoint(i)
-						elseif RareSeen[RareIDs[i]] ~= nil then
+						elseif t == false then
 							RC.mid.button[i]:Hide()
-							RC.mid.text[i]:SetText(ColorfulTime(math.floor((time()-RareSeen[RareIDs[i]])/60)).."m")
+							RC.mid.text[i]:SetText("-")
 						else
 							RC.mid.button[i]:Hide()
-							RC.mid.text[i]:SetText("never")
+							RC.mid.text[i]:SetText(ColorfulTime(math.floor((time()-t)/60)).."m")
 						end
 					end
 				end
