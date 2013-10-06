@@ -173,74 +173,74 @@ local RareIDs = {
 	71919 -- Zhu-Gon the Sour
 	--69384  -- Luminescent Crawler - FOR TESTING ONLY
 }
-local RareCoords = {
-	"next to any cauldron within Ordon Sanctuary", -- Archiereus of Flame Sanctuary
-	"on the Tree-Breeze Terrace (34/28)", -- Archiereus of Flame Summoned
-	"around 65.4 / 70.0", -- Bufo
-	"patrols between the 2 big bridges", -- Champion of the Black Flame
-	"25.3 / 35.8", -- Chelon
-	"54.0 / 52.4", -- Cinderfall
-	"44.5 / 69.0", -- Cranegnasher
-	"25.8 / 23.2", -- Dread Ship Vazuvius
-	"varied spawn in the forest", -- Emerald Gander
-	"swims around the isle", -- Evermaw
-	"varied spawn around Ordon Sanctuary", -- Flintlord Gairan
-	"64.8 / 28.8", -- Garnia
-	"62.5 / 63.5", -- Golganarr
-	"varied spawn around west coast", -- Great Turtle Furyshell
-	"varied spawn around Old Pi'jiu village", -- Gu'chi the Swarmbringer
-	"varied spawn flying around the bridges", -- Huolon 
-	"varied spawn around the forests in the center area", -- Imperial Python
-	"varied spawn around the center area", -- Ironfur Steelhorn
-	"52.0 / 83.4", -- Jakur of Ordon
-	"33.9 / 85.1", -- Karkanos
-	"67.3 / 44.1", -- Leafmender
-	"varied spawn around the beach", -- Monstrous Spineclaw
-	"60.6 / 87.2", -- Rattleskew
-	"45.4 / 29.4", -- Rock Moss
-	"59.0 / 48.8", -- Spelurk
-	"45.4 / 38.9", -- Spirit of Jadefire
-	"71.5 / 80.7", -- Stinkbraid 
-	"54.6 / 44.3", -- Tsavo'ka
-	"45.4 / 26.6", -- Urdur the Cauterizer
-	"57.5 / 77.1", -- Watcher Osu
-	"47.6 / 87.3", -- Zesqua
-	"37.4 / 77.4" -- Zhu-Gon the Sour
-}
-local RareCoordsRaw = {
-	{x=49.7, y=22.2}, -- Archiereus of Flame Sanctuary
-	{x=34.9, y=28.9}, -- Archiereus of Flame Summoned
-	{x=65.4, y=70.0}, -- Bufo
-	{x=0, y=0}, -- Champion of the Black Flame
-	{x=25.3, y=35.8}, -- Chelon
-	{x=54.0, y=52.4}, -- Cinderfall
-	{x=44.5, y=69.0}, -- Cranegnasher
-	{x=25.8, y=23.2}, -- Dread Ship Vazuvius
-	{x=0, y=0}, -- Emerald Gander
-	{x=0, y=0}, -- Evermaw
-	{x=0, y=0}, -- Flintlord Gairan
-	{x=64.8, y=28.8}, -- Garnia
-	{x=62.5, y=63.5}, -- Golganarr
-	{x=0, y=0}, -- Great Turtle Furyshell
-	{x=0, y=0}, -- Gu'chi the Swarmbringer
-	{x=0, y=0}, -- Huolon 
-	{x=0, y=0}, -- Imperial Python
-	{x=0, y=0}, -- Ironfur Steelhorn
-	{x=52.0, y=83.4}, -- Jakur of Ordon
-	{x=33.9, y=85.1}, -- Karkanos
-	{x=67.3, y=44.1}, -- Leafmender
-	{x=0, y=0}, -- Monstrous Spineclaw
-	{x=60.6, y=87.2}, -- Rattleskew
-	{x=45.4, y=29.4}, -- Rock Moss
-	{x=59.0, y=48.8}, -- Spelurk
-	{x=45.4, y=38.9}, -- Spirit of Jadefire
-	{x=71.5, y=80.7}, -- Stinkbraid 
-	{x=54.6, y=44.3}, -- Tsavo'ka
-	{x=45.4, y=26.6}, -- Urdur the Cauterizer
-	{x=57.5, y=77.1}, -- Watcher Osu
-	{x=47.6, y=87.3}, -- Zesqua
-	{x=37.4, y=77.4} -- Zhu-Gon the Sour
-}
+local RareCoords = {}
+RareCoords[73174] = "next to any cauldron within Ordon Sanctuary" -- Archiereus of Flame Sanctuary
+RareCoords[73666] = "on the Tree-Breeze Terrace (34/28)" -- Archiereus of Flame Summoned
+RareCoords[72775] = "around 65.4 / 70.0" -- Bufo
+RareCoords[73171] = "patrols between the 2 big bridges" -- Champion of the Black Flame
+RareCoords[72045] = "25.3 / 35.8" -- Chelon
+RareCoords[73175] = "54.0 / 52.4" -- Cinderfall
+RareCoords[72049] = "44.5 / 69.0" -- Cranegnasher
+RareCoords[73281] = "25.8 / 23.2" -- Dread Ship Vazuvius
+RareCoords[73158] = "varied spawn in the forest" -- Emerald Gander
+RareCoords[73279] = "swims around the isle" -- Evermaw
+RareCoords[73172] = "varied spawn around Ordon Sanctuary" -- Flintlord Gairan
+RareCoords[73282] = "64.8 / 28.8" -- Garnia
+RareCoords[72970] = "62.5 / 63.5" -- Golganarr
+RareCoords[73161] = "varied spawn around west coast" -- Great Turtle Furyshell
+RareCoords[72909] = "varied spawn around Old Pi'jiu village" -- Gu'chi the Swarmbringer
+RareCoords[73167] = "varied spawn flying around the bridges" -- Huolon 
+RareCoords[73163] = "varied spawn around the forests in the center area" -- Imperial Python
+RareCoords[73160] = "varied spawn around the center area" -- Ironfur Steelhorn
+RareCoords[73169] = "52.0 / 83.4" -- Jakur of Ordon
+RareCoords[72193] = "33.9 / 85.1" -- Karkanos
+RareCoords[73277] = "67.3 / 44.1" -- Leafmender
+RareCoords[73166] = "varied spawn around the beach" -- Monstrous Spineclaw
+RareCoords[72048] = "60.6 / 87.2" -- Rattleskew
+RareCoords[73157] = "45.4 / 29.4" -- Rock Moss
+RareCoords[71864] = "59.0 / 48.8" -- Spelurk
+RareCoords[72769] = "45.4 / 38.9" -- Spirit of Jadefire
+RareCoords[73704] = "71.5 / 80.7" -- Stinkbraid 
+RareCoords[72808] = "54.6 / 44.3" -- Tsavo'ka
+RareCoords[73173] = "45.4 / 26.6" -- Urdur the Cauterizer
+RareCoords[73170] = "57.5 / 77.1" -- Watcher Osu
+RareCoords[72245] = "47.6 / 87.3" -- Zesqua
+RareCoords[71919] = "37.4 / 77.4" -- Zhu-Gon the Sour
+
+local RareCoordsRaw = {}
+RareCoordsRaw[73174] = {x=49.7, y=22.2} -- Archiereus of Flame Sanctuary
+RareCoordsRaw[73666] = {x=34.9, y=28.9} -- Archiereus of Flame Summoned
+RareCoordsRaw[72775] = {x=65.4, y=70.0} -- Bufo
+RareCoordsRaw[73171] = {x=0, y=0} -- Champion of the Black Flame
+RareCoordsRaw[72045] = {x=25.3, y=35.8} -- Chelon
+RareCoordsRaw[73175] = {x=54.0, y=52.4} -- Cinderfall
+RareCoordsRaw[72049] = {x=44.5, y=69.0} -- Cranegnasher
+RareCoordsRaw[73281] = {x=25.8, y=23.2} -- Dread Ship Vazuvius
+RareCoordsRaw[73158] = {x=0, y=0} -- Emerald Gander
+RareCoordsRaw[73279] = {x=0, y=0} -- Evermaw
+RareCoordsRaw[73172] = {x=0, y=0} -- Flintlord Gairan
+RareCoordsRaw[73282] = {x=64.8, y=28.8} -- Garnia
+RareCoordsRaw[72970] = {x=62.5, y=63.5} -- Golganarr
+RareCoordsRaw[73161] = {x=0, y=0} -- Great Turtle Furyshell
+RareCoordsRaw[72909] = {x=0, y=0} -- Gu'chi the Swarmbringer
+RareCoordsRaw[73167] = {x=0, y=0} -- Huolon 
+RareCoordsRaw[73163] = {x=0, y=0} -- Imperial Python
+RareCoordsRaw[73160] = {x=0, y=0} -- Ironfur Steelhorn
+RareCoordsRaw[73169] = {x=52.0, y=83.4} -- Jakur of Ordon
+RareCoordsRaw[72193] = {x=33.9, y=85.1} -- Karkanos
+RareCoordsRaw[73277] = {x=67.3, y=44.1} -- Leafmender
+RareCoordsRaw[73166] = {x=0, y=0} -- Monstrous Spineclaw
+RareCoordsRaw[72048] = {x=60.6, y=87.2} -- Rattleskew
+RareCoordsRaw[73157] = {x=45.4, y=29.4} -- Rock Moss
+RareCoordsRaw[71864] = {x=59.0, y=48.8} -- Spelurk
+RareCoordsRaw[72769] = {x=45.4, y=38.9} -- Spirit of Jadefire
+RareCoordsRaw[73704] = {x=71.5, y=80.7} -- Stinkbraid 
+RareCoordsRaw[72808] = {x=54.6, y=44.3} -- Tsavo'ka
+RareCoordsRaw[73173] = {x=45.4, y=26.6} -- Urdur the Cauterizer
+RareCoordsRaw[73170] = {x=57.5, y=77.1} -- Watcher Osu
+RareCoordsRaw[72245] = {x=47.6, y=87.3} -- Zesqua
+RareCoordsRaw[71919] = {x=37.4, y=77.4} -- Zhu-Gon the Sour
+
 local RareNamesLocalized = {};
 RareNamesLocalized['enUS'] = {}
 RareNamesLocalized['enUS'][73174] = "Archiereus of Flame (Sanctuary)" 
@@ -446,7 +446,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.4.0-7"
+RC.version = "5.4.0-8"
 RC.RareCount = #RareIDs
 
 function RC:getLocalRareName(id)
@@ -485,10 +485,10 @@ function RC:setWaypoint(id)
 	if TomTom ~= nil and RCDB.tomtom then
 		if currentWaypointX == false and currentWaypointY == false then
 			if RareCoordsRaw[id]["x"] ~= 0 and RareCoordsRaw[id]["y"] ~= 0 then
-				TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(RareIDs[id]))
+				TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(id))
 				currentWaypointX = RareCoordsRaw[id]["x"]
 				currentWaypointY = RareCoordsRaw[id]["y"]
-				currentWaypointNPCID = RareIDs[id]
+				currentWaypointNPCID = id
 			end
 		end
 	end
@@ -1129,6 +1129,7 @@ local function updateText(self,elapsed)
 							else
 								RC.mid.text[k]:SetText("|cff00ff00alive|r")
 							end
+							RC:setWaypoint(v.id)
 						elseif t == false then --nodata
 							RC.mid.button[k]:Hide()
 							RC.mid.text[k]:SetText("-")
@@ -1187,7 +1188,7 @@ local function updateText(self,elapsed)
 							else
 								RC.mid.text[i]:SetText("|cff00ff00alive|r")
 							end
-							RC:setWaypoint(i)
+							RC:setWaypoint(RareIDs[i])
 						elseif t == false then
 							RC.mid.button[i]:Hide()
 							RC.mid.text[i]:SetText("-")
