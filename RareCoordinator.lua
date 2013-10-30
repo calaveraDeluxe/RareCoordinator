@@ -436,7 +436,7 @@ local RareNotified = {}
 local LastSent = {}
 local RareAv = {}
 local SoundPlayed = {}
-
+  
 --local SoundPlayed = 0
 local VersionNotify = false
 local myChan = false
