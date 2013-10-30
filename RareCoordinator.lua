@@ -146,7 +146,7 @@ local RareIDs = {
 	72045, -- Chelon
 	73175, -- Cinderfall
 	72049, -- Cranegnasher
-	71826, -- Crystal Event
+--	71826, -- Crystal Event
 	73281, -- Dread Ship Vazuvius
 	73158, -- Emerald Gander
 	73279, -- Evermaw
@@ -182,7 +182,7 @@ RareCoords[73171] = "patrols between the 2 big bridges" -- Champion of the Black
 RareCoords[72045] = "25.3 / 35.8" -- Chelon
 RareCoords[73175] = "54.0 / 52.4" -- Cinderfall
 RareCoords[72049] = "44.5 / 69.0" -- Cranegnasher
-RareCoords[71826] = "47.5 / 73.5" -- Crystal Event
+--RareCoords[71826] = "47.5 / 73.5" -- Crystal Event
 RareCoords[73281] = "25.8 / 23.2" -- Dread Ship Vazuvius
 RareCoords[73158] = "varied spawn in the forest" -- Emerald Gander
 RareCoords[73279] = "swims around the isle" -- Evermaw
@@ -217,7 +217,7 @@ RareCoordsRaw[73171] = {x=0, y=0} -- Champion of the Black Flame
 RareCoordsRaw[72045] = {x=25.3, y=35.8} -- Chelon
 RareCoordsRaw[73175] = {x=54.0, y=52.4} -- Cinderfall
 RareCoordsRaw[72049] = {x=44.5, y=69.0} -- Cranegnasher
-RareCoordsRaw[71826] = {x=47.5, y=73.5} -- Crystal Event
+--RareCoordsRaw[71826] = {x=47.5, y=73.5} -- Crystal Event
 RareCoordsRaw[73281] = {x=25.8, y=23.2} -- Dread Ship Vazuvius
 RareCoordsRaw[73158] = {x=0, y=0} -- Emerald Gander
 RareCoordsRaw[73279] = {x=0, y=0} -- Evermaw
@@ -253,7 +253,7 @@ RareNamesLocalized['enUS'][73171] = "Champion of the Black Flame"
 RareNamesLocalized['enUS'][72045] = "Chelon"
 RareNamesLocalized['enUS'][73175] = "Cinderfall"
 RareNamesLocalized['enUS'][72049] = "Cranegnasher"
-RareNamesLocalized['enUS'][71826] = "Crystal Event"
+--RareNamesLocalized['enUS'][71826] = "Crystal Event"
 RareNamesLocalized['enUS'][73281] = "Dread Ship Vazuvius"
 RareNamesLocalized['enUS'][73158] = "Emerald Gander"
 RareNamesLocalized['enUS'][73279] = "Evermaw"
@@ -288,7 +288,7 @@ RareNamesLocalized['deDE'][73171] = "Champion der Schwarzen Flamme"
 RareNamesLocalized['deDE'][72045] = "Chelon"
 RareNamesLocalized['deDE'][73175] = "Glutfall"
 RareNamesLocalized['deDE'][72049] = "Kranichknirscher"
-RareNamesLocalized['deDE'][71826] = "Kristall Event"
+--RareNamesLocalized['deDE'][71826] = "Kristall Event"
 RareNamesLocalized['deDE'][73281] = "Schreckensschiff Vazuvius"
 RareNamesLocalized['deDE'][73158] = "Smaragdkranich"
 RareNamesLocalized['deDE'][73279] = "Tiefenschlund"
@@ -418,8 +418,8 @@ local SoundsToPlay = {}
 SoundsToPlay['none'] = ""
 SoundsToPlay['DIIING'] = "sound\\CREATURE\\MANDOKIR\\VO_ZG2_MANDOKIR_LEVELUP_EVENT_01.ogg"
 SoundsToPlay['You are not prepared!'] = "sound\\Creature\\Illidan\\BLACK_Illidan_04.wav"
-SoundsToPlay['Plaaaytime'] = "Sound\\Creature\\Meathook\\CS_Meathook_Spawn.wav"
-SoundsToPlay['Intruder alert'] = "Sound\\Creature\\MobileAlertBot\\MobileAlertBotIntruderAlert01.wav"
+--SoundsToPlay['Plaaaytime'] = "Sound\\Creature\\Meathook\\CS_Meathook_Spawn.wav"
+--SoundsToPlay['Intruder alert'] = "Sound\\Creature\\MobileAlertBot\\MobileAlertBotIntruderAlert01.wav"
 SoundsToPlay['BG win soon'] = "Sound\\Interface\\PVPWarningHordeMono.wav"
 SoundsToPlay['Flag taken'] = "Sound\\Interface\\PVPFlagTakenMono.wav"
 SoundsToPlay['Raid Warning'] = "Sound\\interface\\RaidWarning.wav"
@@ -451,7 +451,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.4.0-8"
+RC.version = "5.4.1-1"
 RC.RareCount = #RareIDs
 
 function RC:getLocalRareName(id)
