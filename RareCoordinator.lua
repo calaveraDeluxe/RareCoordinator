@@ -436,7 +436,7 @@ local RareNotified = {}
 local LastSent = {}
 local RareAv = {}
 local SoundPlayed = {}
-  
+
 --local SoundPlayed = 0
 local VersionNotify = false
 local myChan = false
@@ -451,7 +451,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.4.1-1"
+RC.version = "5.4.1-2"
 RC.RareCount = #RareIDs
 
 function RC:getLocalRareName(id)
@@ -1547,11 +1547,11 @@ function RC:CompareVersion(v)
 	end
 	if expan2 > expan1 then
 		newVersion = true
-	elseif cpatch2 > cpatch1 then
+	elseif cpatch2 > cpatch1 and (expan2<=expan1) then
 		newVersion = true
-	elseif mpatch2 > mpatch1 then
+	elseif mpatch2 > mpatch1 and (expan2<=expan1 and cpatch2<=cpatch1) then
 		newVersion = true
-	elseif revision2 > revision1 then
+	elseif revision2 > revision1 and (expan2<=expan1 and cpatch2<=cpatch1 and mpatch2<=mpatch1) then
 		newVersion = true
 	end
 	if newVersion and VersionNotify == false then
