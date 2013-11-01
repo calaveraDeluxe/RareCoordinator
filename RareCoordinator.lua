@@ -451,7 +451,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.4.1-2"
+RC.version = "5.4.1-3"
 RC.RareCount = #RareIDs
 
 function RC:getLocalRareName(id)
@@ -1527,31 +1527,34 @@ end
 function RC:CompareVersion(v)
 	local i=0
 	local newVersion=false
-	local expan1, cpatch1, mpatch1, revision1, expan2, cpatch2, mpatch2, revision2
+	local myexp, mycpatch, mympatch, myrev, otherexp, othercpatch, othermpatch, otherrev 
 	for n in string.gmatch(self.version, "%d+") do
-		if     i == 0 then expan1 = tonumber(n)
-		elseif i == 1 then cpatch1 = tonumber(n)
-		elseif i == 2 then mpatch1 = tonumber(n)
-		elseif i == 3 then revision1 = tonumber(n)
+		if     i == 0 then myexp = tonumber(n)
+		elseif i == 1 then mycpatch = tonumber(n)
+		elseif i == 2 then mympatch = tonumber(n)
+		elseif i == 3 then myrev = tonumber(n)
 		end
 		i = i + 1
 	end
 	i=0
 	for n in string.gmatch(v, "%d+") do
-		if     i == 0 then expan2 = tonumber(n)
-		elseif i == 1 then cpatch2 = tonumber(n)
-		elseif i == 2 then mpatch2 = tonumber(n)
-		elseif i == 3 then revision2 = tonumber(n)
+		if     i == 0 then otherexp = tonumber(n)
+		elseif i == 1 then othercpatch = tonumber(n)
+		elseif i == 2 then othermpatch = tonumber(n)
+		elseif i == 3 then otherrev = tonumber(n)
 		end
 		i = i + 1
 	end
-	if expan2 > expan1 then
+	if otherexp > myexp then
 		newVersion = true
-	elseif cpatch2 > cpatch1 and (expan2<=expan1) then
+	end
+	if othercpatch > mycpatch and otherexp == myexp then
 		newVersion = true
-	elseif mpatch2 > mpatch1 and (expan2<=expan1 and cpatch2<=cpatch1) then
+	end
+	if othermpatch > mympatch and otherexp == myexp and othercpatch == mycpatch then
 		newVersion = true
-	elseif revision2 > revision1 and (expan2<=expan1 and cpatch2<=cpatch1 and mpatch2<=mpatch1) then
+	end
+	if otherrev > myrev and otherexp == myexp and othercpatch == mycpatch and othermpatch == mympatch then
 		newVersion = true
 	end
 	if newVersion and VersionNotify == false then
