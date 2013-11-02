@@ -39,8 +39,9 @@ function onResize(self, width, height)
 	end
 	
 	RCminimized:SetWidth(self:GetWidth())
-	
-	
+	self.message:SetWidth(self:GetWidth())
+	self.message:SetHeight(20*scale)
+	self.message.text:SetFont("Fonts\\ARIALN.TTF",12*scale, "OUTLINE")
 	
 	if self.left ~= nil then 
 		self.left:SetPoint("TOPLEFT", self, 4*scale, -5*scale)
@@ -991,6 +992,29 @@ RC.opt:Hide()
 RC.left.settingsicon:SetScript("OnMouseDown", function (self) OptShowOrHide() end)
 RC.left.minimizeicon:SetScript("OnMouseDown", function (self) MinMaximize() end)
 
+RC.message = CreateFrame("Frame", "RC.message", RC)
+RC.message:SetWidth(RC:GetWidth())
+RC.message:SetHeight(20)
+RC.message:SetPoint("TOP", RC, "BOTTOM", 0, 0)
+RC.message.texture = RC.message:CreateTexture(nil,"BACKGROUND", nil, 1)
+RC.message.texture:SetTexture(1,0.5,0,0.6)
+RC.message.texture:SetAllPoints(RC.message)
+RC.message.text = RC.message:CreateFontString("RC.message.text", nil, "GameFontNormal")
+RC.message.text:SetPoint("CENTER", "RC.message", 0, 0)
+RC.message.text:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
+RC.message.text:SetTextColor(1,1,1)
+
+RC.message.closeicon = CreateFrame("Button", "RC.message.closeicon", RC.message)
+RC.message.closeicon:SetPoint("RIGHT", "RC.message", 0, 0)
+RC.message.closeicon:SetWidth(16)
+RC.message.closeicon:SetHeight(16)
+RC.message.closeicon.texture = RC.message.closeicon:CreateTexture(nil, "OVERLAY")
+RC.message.closeicon.texture:SetTexture([[Interface\AddOns\RareCoordinator\plus.tga]])
+RC.message.closeicon.texture:SetAllPoints(RC.message.closeicon)
+RC.message.closeicon.texture:SetRotation((3*math.pi)/4)
+RC.message.closeicon:SetScript("OnClick", function (self) RC.message:Hide() end)
+
+RC.message:Hide()
 
 
 RCminimized = CreateFrame("Frame", "RCminimized", UIParent)
@@ -1576,8 +1600,10 @@ function RC:CompareVersion(v)
 		newVersion = true
 	end
 	if newVersion and VersionNotify == false then
-		print("RareCoordinator - New Version available: |cff00ff00"..v.."|r (You are using |cffff0000"..RC.version.."|r)")
+		--print("RareCoordinator - New Version available: |cff00ff00"..v.."|r (You are using |cffff0000"..RC.version.."|r)")
 		VersionNotify = true
+		self.message.text:SetText("New Version available: |cff00ff00"..v.."|r")
+		self.message:Show()
 	end
 end
 
