@@ -599,6 +599,12 @@ local function MinMaximize()
 	end
 end
 
+local function RCPlaySoundFile(f, channel)
+	if f ~= nil then
+		PlaySoundFile(f, channel)
+	end
+end
+
 local function IsInXRealmGrp()
 	local n = GetNumGroupMembers()
 	if n == 0 then
@@ -887,7 +893,7 @@ end)
 function RC.opt.sound.dropdown:SetValue(newValue)
 	UIDropDownMenu_SetText(RC.opt.sound.dropdown, newValue)
 	RCDB.sound = newValue
-	PlaySoundFile(SoundsToPlay[newValue], "master")
+	RCPlaySoundFile(SoundsToPlay[newValue], "master")
 end
 
 RC.opt.tomtom = CreateFrame("Frame", "RC.opt.tomtom", RC.opt)
@@ -1122,10 +1128,10 @@ local function updateText(self,elapsed)
 						local t = RC:getRealRareTime(v.id)
 						if t == true then --alive
 							if SoundPlayed[v.id] == nil then
-								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								RCPlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
 								SoundPlayed[v.id] = time()
 							elseif time() > SoundPlayed[v.id] + 600 then
-								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								RCPlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
 								SoundPlayed[v.id] = time()
 							end
 							RC.mid.button[k]:Show()
@@ -1181,10 +1187,10 @@ local function updateText(self,elapsed)
 						local t=RC:getRealRareTime(RareIDs[i])
 						if t == true then
 							if SoundPlayed[RareIDs[i]] == nil then
-								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								RCPlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
 								SoundPlayed[RareIDs[i]] = time()
 							elseif time() > SoundPlayed[RareIDs[i]] + 600 then
-								PlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
+								RCPlaySoundFile(SoundsToPlay[RCDB.sound], "MASTER")
 								SoundPlayed[RareIDs[i]] = time()
 							end
 							RC.mid.button[i]:Show()
@@ -1274,6 +1280,12 @@ function RC:OnEvent(event, ...)
 	if event == "UNIT_HEALTH" then
 		self:UnitHealth(...)
 	end
+	if event == "PLAYER_REGEN_DISABLED" then
+		self:ShowNotifyClose(false)
+	end
+	if event == "PLAYER_REGEN_ENABLED" then
+		self:ShowNotifyClose(true)
+	end
 end
 
 function RC:OnLoad(...)
@@ -1354,6 +1366,8 @@ function RC:ShowOrHide(...)
 		self:UnregisterEvent("UNIT_HEALTH")
 		self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 		self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+		self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+		self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 	else
 		if GetCurrentMapAreaID() == 951 or GetCurrentMapAreaID() == 888 then
 			RareAlive = {}
@@ -1369,6 +1383,8 @@ function RC:ShowOrHide(...)
 			self:RegisterEvent("UNIT_HEALTH")
 			self:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 			self:RegisterEvent("PLAYER_TARGET_CHANGED")
+			self:RegisterEvent("PLAYER_REGEN_ENABLED")
+			self:RegisterEvent("PLAYER_REGEN_DISABLED")
 			RegisterAddonMessagePrefix("RCELVA")
 		else
 			self:Hide()
@@ -1377,6 +1393,8 @@ function RC:ShowOrHide(...)
 			self:UnregisterEvent("UNIT_HEALTH")
 			self:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 			self:UnregisterEvent("PLAYER_TARGET_CHANGED")
+			self:UnregisterEvent("PLAYER_REGEN_ENABLED")
+			self:UnregisterEvent("PLAYER_REGEN_DISABLED")
 		end
 	end
 end
@@ -1804,6 +1822,13 @@ local function LockOrUnlock()
 	end
 end
 
+function RC:ShowNotifyClose(p)
+	if p then
+		RCnotify.closeicon:Show()
+	else
+		RCnotify.closeicon:Hide()
+	end
+end
 
 function RC:Notify(id)
 	if RCDB.notify then
