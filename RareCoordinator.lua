@@ -1155,7 +1155,12 @@ local function updateText(self,elapsed)
 			
 				if RC.left.text ~= nil then
 					for i=1,table.getn(RC.left.icon) do
-						RC.left.text[i]:SetText(RC:getLocalRareName(RareIDs[i]))
+						if RareIDs[i] == 73167 then
+							"|cFFE86A0C"..RC.left.text[i]:SetText(RC:getLocalRareName(RareIDs[i])).."|r"
+						else
+							RC.left.text[i]:SetText(RC:getLocalRareName(RareIDs[i]))
+						end
+						
 					end
 				end
 					
