@@ -1101,7 +1101,11 @@ local function updateText(self,elapsed)
 			for k,v in pairs(sorted) do
 				if RC.left ~= nil then
 					if RC.left.text ~= nil then
-						RC.left.text[k]:SetText(RC:getLocalRareName(v.id))
+						if v.id == 73167 then
+							RC.left.text[k]:SetText("|cffe86a0c"..RC:getLocalRareName(v.id).."|r")
+						else
+							RC.left.text[k]:SetText(RC:getLocalRareName(v.id))
+						end
 					end
 					if RC.left.icon ~= nil then
 						if RareAv[v.id] ~= nil then
@@ -1156,9 +1160,9 @@ local function updateText(self,elapsed)
 				if RC.left.text ~= nil then
 					for i=1,table.getn(RC.left.icon) do
 						if RareIDs[i] == 73167 then
-							"|cFFE86A0C"..RC.left.text[i]:SetText(RC:getLocalRareName(RareIDs[i])).."|r"
+							RC.left.text[i]:SetText("|cffe86a0ctest"..RC:getLocalRareName(RareIDs[i]).."|r")
 						else
-							RC.left.text[i]:SetText(RC:getLocalRareName(RareIDs[i]))
+							RC.left.text[i]:SetText("test "..RC:getLocalRareName(RareIDs[i]))
 						end
 						
 					end
