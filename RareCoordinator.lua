@@ -244,6 +244,40 @@ RareCoordsRaw[73170] = {x=57.5, y=77.1} -- Watcher Osu
 RareCoordsRaw[72245] = {x=47.6, y=87.3} -- Zesqua
 RareCoordsRaw[71919] = {x=37.4, y=77.4} -- Zhu-Gon the Sour
 
+local RareDailyQuests = {}
+RareDailyQuests[73174] = {first = 33288, daily = 33312} -- Archiereus of Flame Sanctuary
+RareDailyQuests[73666] = {first = -1, daily = -1} -- Archiereus of Flame Summoned
+RareDailyQuests[72775] = {first = 33276, daily = 33301} -- Bufo
+RareDailyQuests[73171] = {first = 33274, daily = 33299} -- Champion of the Black Flame
+RareDailyQuests[72045] = {first = 33318, daily = 32966} -- Chelon
+RareDailyQuests[73175] = {first = 33286, daily = 33310} -- Cinderfall
+RareDailyQuests[72049] = {first = 33319, daily = 32967} -- Cranegnasher
+RareDailyQuests[73281] = {first = 33290, daily = 33314} -- Dread Ship Vazuvius
+RareDailyQuests[73158] = {first = 33261, daily = 33295} -- Emerald Gander
+RareDailyQuests[73279] = {first = 33289, daily = 33313} -- Evermaw
+RareDailyQuests[73172] = {first = 33285, daily = 33309} -- Flintlord Gairan
+RareDailyQuests[73282] = {first = 33275, daily = 33300} -- Garnia
+RareDailyQuests[72970] = {first = 33291, daily = 33315} -- Golganarr
+RareDailyQuests[73161] = {first = 33272, daily = 33297} -- Great Turtle Furyshell
+RareDailyQuests[72909] = {first = 33260, daily = 33294} -- Gu'chi the Swarmbringer
+RareDailyQuests[73167] = {first = 33287, daily = 33311} -- Huolon 
+RareDailyQuests[73163] = {first = 33278, daily = 33303} -- Imperial Python
+RareDailyQuests[73160] = {first = 33270, daily = 33296} -- Ironfur Steelhorn
+RareDailyQuests[73169] = {first = 33281, daily = 33306} -- Jakur of Ordon
+RareDailyQuests[72193] = {first = 33258, daily = 33292} -- Karkanos
+RareDailyQuests[73277] = {first = 33273, daily = 33298} -- Leafmender
+RareDailyQuests[73166] = {first = 33277, daily = 33302} -- Monstrous Spineclaw
+RareDailyQuests[72048] = {first = -1, daily = -1} -- Rattleskew
+RareDailyQuests[73157] = {first = 33283, daily = 33307} -- Rock Moss
+RareDailyQuests[71864] = {first = -1, daily = -1} -- Spelurk (no ids found on wowhead)
+RareDailyQuests[72769] = {first = 33259, daily = 33293} -- Spirit of Jadefire
+RareDailyQuests[73704] = {first = 33280, daily = 33305} -- Stinkbraid 
+RareDailyQuests[72808] = {first = 33279, daily = 33304} -- Tsavo'ka
+RareDailyQuests[73173] = {first = 33284, daily = 33308} -- Urdur the Cauterizer
+RareDailyQuests[73170] = {first = 33321, daily = 33322} -- Watcher Osu
+RareDailyQuests[72245] = {first = 32997, daily = 33316} -- Zesqua
+RareDailyQuests[71919] = {first = -1, daily = 32959} -- Zhu-Gon the Sour
+
 local RareNamesLocalized = {};
 RareNamesLocalized['enUS'] = {}
 RareNamesLocalized['enUS'][73174] = "Archiereus of Flame (Sanctuary)" 
