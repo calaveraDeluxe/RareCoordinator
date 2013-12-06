@@ -1945,8 +1945,10 @@ function RC:Notify(id)
 			RCnotify.model:SetCreature(id)
 			RCnotify.name:SetText(self:getLocalRareName(id))
 			--RCnotify:SetScript("OnMouseDown", function (self) OnMouseDownTarget() end
-			RCnotify:SetAttribute( "macrotext", "/cleartarget\n/targetexact ".. self:getLocalRareName(id));
-			RCnotify:Show()
+			if InCombatLockdown() == nil then
+				RCnotify:SetAttribute( "macrotext", "/cleartarget\n/targetexact ".. self:getLocalRareName(id));
+				RCnotify:Show()
+			end
 			RareNotified[id] = time()
 		end
 	end
