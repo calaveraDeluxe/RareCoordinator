@@ -466,6 +466,7 @@ local txt = ""
 local currentWaypointX = false
 local currentWaypointY = false
 local currentWaypointNPCID = false
+local Waypoints = {}
 
 local needStatus = false
 
@@ -506,16 +507,29 @@ function RC:getTargetPercentHProunded()
 	end
 end
 
-function RC:setWaypoint(id)
+function RC:setWaypoint(id, x, y)
 	if TomTom ~= nil and RCDB.tomtom then
-		if currentWaypointX == false and currentWaypointY == false then
+		--print(id,x,y)
+		if x == nil or y == nil then
 			if RareCoordsRaw[id]["x"] ~= 0 and RareCoordsRaw[id]["y"] ~= 0 then
-				TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(id))
-				currentWaypointX = RareCoordsRaw[id]["x"]
-				currentWaypointY = RareCoordsRaw[id]["y"]
-				currentWaypointNPCID = id
+				if Waypoints[id] ~= nil then
+					self:removeWaypoint(id)
+				end
+				Waypoints[id] = TomTom:AddWaypoint(RareCoordsRaw[id]["x"],RareCoordsRaw[id]["y"],self:getLocalRareName(id))
 			end
+		elseif x ~= nil and y ~= nil then
+			if Waypoints[id] ~= nil then
+				self:removeWaypoint(id)
+			end
+			Waypoints[id] = TomTom:AddWaypoint(x,y,self:getLocalRareName(id))
+			--print("SetWaypoint to "..x..","..y)
 		end
+	end
+end
+
+function RC:removeWaypoint(id)
+	if Waypoints[id] ~= nil then
+		TomTom:RemoveWaypoint(Waypoints[id])
 	end
 end
 
@@ -577,7 +591,7 @@ local function OnMouseDownAnnounce(id)
 		if RareAliveHP[id] == nil then
 			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(id)..": "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
 		else
-			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(id).."("..RareAliveHP[id].."%): "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
+			SendChatMessage("{rt1} [RareCoordinator] "..RC:getLocalRareName(id).." ("..RareAliveHP[id].."%): "..RareCoords[id].." {rt1}", "CHANNEL", nil, 1)
 		end
 		SendChatMessage("[RCELVA]"..RC.version.."_"..id.."_announce_"..time().."_", "CHANNEL", nil, RC:getChanID(GetChannelList()))
 		RareAnnounced[id] = time()
@@ -592,6 +606,9 @@ local function ShowMap(id)
 			local sorted = RC:createSortedTable()
 			RC.mid.map[id].overlay:SetTexture("Interface\\AddOns\\RareCoordinator\\imgs\\"..GetCurrentMapAreaID().."\\"..sorted[id].id..".tga")
 			RC.mid.map[id].text:SetText(RC:getLocalRareName(sorted[id].id))
+		else
+			RC.mid.map[id].overlay:SetTexture("Interface\\AddOns\\RareCoordinator\\imgs\\"..GetCurrentMapAreaID().."\\"..RareIDs[id]..".tga")
+			RC.mid.map[id].text:SetText(RC:getLocalRareName(RareIDs[id]))
 		end
 		RC.mid.map[id]:Show()	
 	end
@@ -696,6 +713,18 @@ function num2hex(num)
 	end
 	if s == '' then s = '0' end
 	return s
+end
+
+local function getNicePlayerPosition()
+	local x,y = GetPlayerMapPosition("player")
+	x = math.floor(x*100+0.5)
+	y = math.floor(y*100+0.5)
+	return x,y
+end
+
+local function getFormattedCurrentPlayerPosition()
+	local x,y = getNicePlayerPosition()
+	return ","..x.."-"..y
 end
 
 local function ColorfulTime(m)
@@ -1449,12 +1478,12 @@ function RC:UnitHealth(unit)
 				if per and per >= 0 then
 					if RareAliveHP[id] ~= nil then
 						if RareAliveHP[id] > per then
-							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per.."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per..getFormattedCurrentPlayerPosition().."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 							RareAliveHP[id] = per
 							updateText(self, 100)
 						end
 					else
-						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per.."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive"..per..getFormattedCurrentPlayerPosition().."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 						RareAliveHP[id] = per
 						updateText(self, 100)
 					end
@@ -1546,27 +1575,27 @@ function RC:Chat(message, sender, language, channelString, target, flags, unknow
 						if eventType == "alive" then
 							RareAlive[v] = eventTime
 						elseif string.sub(eventType,0,5) == "alive" then
-							RareAlive[v] = eventTime
-							RareAliveHP[v] = tonumber(string.sub(eventType,6))
+							if string.find(eventType, ",") ~= nil and string.find(eventType, "-") ~= nil then
+								local hp,x,y = string.match(eventType, "(%d+),(%d+)-(%d+)")
+								hp = tonumber(hp)
+								x = tonumber(x)
+								y = tonumber(y)
+								RareAlive[v] = eventTime
+								RareAliveHP[v] = hp
+								self:setWaypoint(v,x,y)
+							else
+								RareAlive[v] = eventTime
+								RareAliveHP[v] = tonumber(string.sub(eventType,6))
+							end
 						elseif eventType == "dead" then
 							RareAlive[v] = nil
 							RareAliveHP[v] = nil
-							if currentWaypointNPCID ~= nil then
-								if currentWaypointNPCID == v then
-									currentWaypointX = false
-									currentWaypointY = false
-								end
-							end
+							self:removeWaypoint(v)
 						elseif eventType == "killed" then
 							RareKilled[v] = eventTime
 							RareAlive[v] = nil
 							RareAliveHP[v] = nil
-							if currentWaypointNPCID ~= nil then
-								if currentWaypointNPCID == v then
-									currentWaypointX = false
-									currentWaypointY = false
-								end
-							end
+							self:removeWaypoint(v)
 						elseif eventType == "seen" then
 							RareSeen[v] = eventTime
 						elseif eventType == "announce" then
@@ -1708,12 +1737,7 @@ function RC:CombatLog(timeStamp, event, hideCaster, sourceGUID, sourceName, sour
 						RareAnnouncedSelf[v] = nil
 						RareAnnounced[v] = nil
 					end
-					if currentWaypointNPCID ~= nil then
-						if currentWaypointNPCID == npcID then
-							currentWaypointX = false
-							currentWaypointY = false
-						end
-					end
+					self:removeWaypoint(v)
 					updateText(self, 100)
 				break
 			end
@@ -1812,19 +1836,14 @@ function RC:Target(...)
 						local per = self:getTargetPercentHProunded()
 						RareAlive[v] = time()
 						if per == 100 then
-							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive100_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
+							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive100"..getFormattedCurrentPlayerPosition().."_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 						else
 							SendChatMessage("[RCELVA]"..self.version.."_"..id.."_alive_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 						end
 					else
 						RareAlive[v] = nil
 						RareAliveHP[v] = nil
-						if currentWaypointNPCID ~= nil then
-							if currentWaypointNPCID == id then
-								currentWaypointX = false
-								currentWaypointY = false
-							end
-						end
+						self:removeWaypoint(v)
 						SendChatMessage("[RCELVA]"..self.version.."_"..id.."_dead_"..time().."_", "CHANNEL", nil, self:getChanID(GetChannelList()))
 					end
 					RareSeen[v] = time()
@@ -1942,14 +1961,14 @@ end
 function RC:Notify(id)
 	if RCDB.notify then
 		if RareNotified[id] == nil or time()-RareNotified[id] > 10*60 then
-			RCnotify.model:SetCreature(id)
-			RCnotify.name:SetText(self:getLocalRareName(id))
-			--RCnotify:SetScript("OnMouseDown", function (self) OnMouseDownTarget() end
 			if InCombatLockdown() == nil then
+				RCnotify.model:SetCreature(id)
+				RCnotify.name:SetText(self:getLocalRareName(id))
+				--RCnotify:SetScript("OnMouseDown", function (self) OnMouseDownTarget() end
 				RCnotify:SetAttribute( "macrotext", "/cleartarget\n/targetexact ".. self:getLocalRareName(id));
 				RCnotify:Show()
+				RareNotified[id] = time()
 			end
-			RareNotified[id] = time()
 		end
 	end
 end
