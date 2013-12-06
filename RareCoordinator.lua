@@ -87,8 +87,14 @@ function onResize(self, width, height)
 			RCminimized.maximizeicon:SetWidth(10*scale)
 			RCminimized.maximizeicon:SetHeight(10*scale)
 		end
-		
-		
+		if self.left.nameframe ~= nil then
+			local i
+			for i=1,table.getn(self.mid.button) do
+				self.left.nameframe[i]:SetPoint("TOPLEFT", "RC.left", 0, -2-(15.4*i)*scale)
+				self.left.nameframe[i]:SetHeight(13*scale)
+				self.left.nameframe[i]:SetWidth(self.left:GetWidth())
+			end
+		end
 	end
 	if self.mid ~= nil then
 		self.mid:SetHeight(height-9*scale)
@@ -113,6 +119,19 @@ function onResize(self, width, height)
 				self.mid.button[i]:SetWidth(self.mid:GetWidth())
 				self.mid.button[i].icon:SetWidth(10*scale)
 				self.mid.button[i].icon:SetHeight(10*scale)
+			end
+		end
+		if self.mid.map ~= nil then 
+			local i
+			for i=1,table.getn(self.mid.map) do
+				if i < table.getn(self.mid.map)/2 then
+					self.mid.map[i]:SetPoint("TOPLEFT", "RC.mid.button["..i.."]", "TOPLEFT", 0, 0)
+				else
+					self.mid.map[i]:SetPoint("TOPLEFT", "RC.mid.button[1]", "TOPLEFT", 0, RC.mid:GetHeight()/2-15.4*i*scale-256/2*(341/512)*scale)
+				end
+				self.mid.map[i]:SetHeight(256*scale)
+				self.mid.map[i]:SetWidth(256*scale)
+				self.mid.map[i].text:SetFont("Fonts\\ARIALN.TTF",12*scale,"OUTLINE")
 			end
 		end
 	end
@@ -566,6 +585,25 @@ local function OnMouseDownAnnounce(id)
 	end
 end
 
+local function ShowMap(id)
+	if RC ~= nil and RC.mid ~= nil and RC.mid.map ~= nil and RC.mid.map[id] ~= nil then
+		RC.mid.map[id].map:SetTexture("Interface\\AddOns\\RareCoordinator\\imgs\\"..GetCurrentMapAreaID().."\\map.tga")
+		if RCDB.sort then
+			local sorted = RC:createSortedTable()
+			RC.mid.map[id].overlay:SetTexture("Interface\\AddOns\\RareCoordinator\\imgs\\"..GetCurrentMapAreaID().."\\"..sorted[id].id..".tga")
+			RC.mid.map[id].text:SetText(RC:getLocalRareName(sorted[id].id))
+		end
+		RC.mid.map[id]:Show()	
+	end
+end
+
+local function HideMap(id)
+	if RC ~= nil and RC.mid ~= nil and RC.mid.map ~= nil and RC.mid.map[id] ~= nil then
+		RC.mid.map[id]:Hide()	
+	end
+end
+
+
 local function OnMouseDownTarget(id)
 	print("Target")
 end
@@ -771,6 +809,22 @@ for i=0, #RareIDs do
 	end
 end
 
+RC.left.nameframe = {}
+for i=0, #RareIDs do
+	if i ~= 0 then
+		RC.left.nameframe[i] = CreateFrame("Frame", "RC.left.nameframe["..i.."]", RC.left)
+		RC.left.nameframe[i]:SetPoint("TOPLEFT", "RC.left", 0, -2 + -14.5*i)
+		RC.left.nameframe[i]:SetHeight(13)
+		RC.left.nameframe[i]:SetWidth(RC.left:GetWidth())
+		--RC.left.nameframe[i].texture = RC.left.nameframe[i]:CreateTexture(nil,"BACKGROUND", nil, 2)
+		--RC.left.nameframe[i].texture:SetTexture(0,0.5,0,0.4)
+		--RC.left.nameframe[i].texture:SetAllPoints(RC.left.nameframe[i])
+	
+		RC.left.nameframe[i]:SetScript("OnEnter", function (self) ShowMap(i) end)
+		RC.left.nameframe[i]:SetScript("OnLeave", function (self) HideMap(i) end)
+		--RC.left.nameframe[i]:Hide()
+	end
+end
 RC.left.minimizeicon = CreateFrame("Frame", "RC.left.minimizeicon", RC.left)
 RC.left.minimizeicon:SetPoint("TOPLEFT", "RC.left", 0, 0)
 RC.left.minimizeicon:SetWidth(10)
@@ -801,7 +855,7 @@ for i=0, #RareIDs do
 	RC.mid.button[i].icon:SetPoint("RIGHT", "RC.mid.button["..i.."]", 2, 0)
 	RC.mid.button[i].icon:SetWidth(10)
 	RC.mid.button[i].icon:SetHeight(10)
-	RC.mid.button[i].icon.texture = RC.mid.button[i].icon:CreateTexture(nil, "OVERLAY")
+	RC.mid.button[i].icon.texture = RC.mid.button[i].icon:CreateTexture(nil, "TOP")
 	RC.mid.button[i].icon.texture:SetTexture([[Interface\AddOns\RareCoordinator\announce.tga]])
 	RC.mid.button[i].icon.texture:SetAllPoints(RC.mid.button[i].icon)
 	if i ~= 0 then
@@ -821,6 +875,35 @@ for i=0, #RareIDs do
 		RC.mid.text[i]:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
 	end
 end
+
+RC.mid.map = {}
+for i=0, #RareIDs do
+	if i ~= 0 then
+		RC.mid.map[i] = CreateFrame("Frame", "RC.mid.map["..i.."]", RC.mid)
+		RC.mid.map[i]:SetPoint("TOPLEFT", "RC.mid.text["..i.."]", "TOPLEFT", 0, 0)
+		RC.mid.map[i]:SetHeight(200)
+		RC.mid.map[i]:SetWidth(200)
+		
+		RC.mid.map[i].map = RC.mid.map[i]:CreateTexture(nil,"OVERLAY", nil, 2)
+		RC.mid.map[i].map:SetTexture(0,0.5,0,0.5)
+		RC.mid.map[i].map:SetAllPoints(RC.mid.map[i])
+		RC.mid.map[i].map:SetDesaturated(true)
+		
+		RC.mid.map[i].overlay = RC.mid.map[i]:CreateTexture(nil,"OVERLAY", nil, 3)
+		RC.mid.map[i].overlay:SetTexture(0.5,0,0,0.5)
+		RC.mid.map[i].overlay:SetAllPoints(RC.mid.map[i])
+		
+		RC.mid.map[i].text = RC.mid.map[i]:CreateFontString("RC.mid.map["..i.."]", nil, "GameFontNormal")
+		RC.mid.map[i].text:SetPoint("TOP", "RC.mid.map["..i.."]", 0, 0)
+		RC.mid.map[i].text:SetDrawLayer("OVERLAY", 4)
+		RC.mid.map[i].text:SetTextColor(1,1,1)
+		RC.mid.map[i].text:SetFont("Fonts\\ARIALN.TTF",12,"OUTLINE")
+		
+		RC.mid.map[i]:Hide()
+	end
+end
+
+
 --RC.right.text = {}
 --local i
 --for i=0, #RareIDs do
@@ -1861,7 +1944,7 @@ function RC:Notify(id)
 		if RareNotified[id] == nil or time()-RareNotified[id] > 10*60 then
 			RCnotify.model:SetCreature(id)
 			RCnotify.name:SetText(self:getLocalRareName(id))
-			--RCnotify:SetScript("OnMouseDown", function (self) OnMouseDownTarget() end)
+			--RCnotify:SetScript("OnMouseDown", function (self) OnMouseDownTarget() end
 			RCnotify:SetAttribute( "macrotext", "/cleartarget\n/targetexact ".. self:getLocalRareName(id));
 			RCnotify:Show()
 			RareNotified[id] = time()
