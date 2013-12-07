@@ -8,7 +8,7 @@ local function onDragStop(self)
 	if self:GetName() == "RC" then
 		RCDB.x = self:GetLeft()
 		RCDB.y = self:GetTop()
-			
+		
 		RCDB.width = self:GetWidth()
 		RCDB.height = self:GetHeight()
 	elseif self:GetName() == "RCnotify" then
@@ -39,9 +39,11 @@ function onResize(self, width, height)
 	end
 	
 	RCminimized:SetWidth(self:GetWidth())
-	self.message:SetWidth(self:GetWidth())
-	self.message:SetHeight(20*scale)
-	self.message.text:SetFont("Fonts\\ARIALN.TTF",12*scale, "OUTLINE")
+	if self.message ~= nil then
+		self.message:SetWidth(self:GetWidth())
+		self.message:SetHeight(20*scale)
+		self.message.text:SetFont("Fonts\\ARIALN.TTF",12*scale, "OUTLINE")
+	end
 	
 	if self.left ~= nil then 
 		self.left:SetPoint("TOPLEFT", self, 4*scale, -5*scale)
@@ -475,7 +477,7 @@ local needStatus = false
 
 --------------------------------
 local RC = CreateFrame("Frame", "RC", UIParent)
-RC.version = "5.4.1-3"
+RC.version = "5.4.1-4"
 RC.RareCount = #RareIDs
 
 function RC:getLocalRareName(id)
@@ -1927,6 +1929,10 @@ local function LockOrUnlock()
 		RC:Show()
 		RC.res:Show()
 		
+		for i=1,table.getn(RC.mid.button) do
+			RC.left.nameframe[i]:Hide()
+		end
+		
 		--RCnotify:EnableMouse(true)
 		RCnotify:SetMovable(true)
 		--RCnotify:SetResizable(true)
@@ -1954,6 +1960,11 @@ local function LockOrUnlock()
 		RC:SetScript("OnHide", nil)
 		RC:ShowOrHide()
 		RC.res:Hide()
+		
+		
+		for i=1,table.getn(RC.mid.button) do
+			RC.left.nameframe[i]:Show()
+		end
 		
 		RCnotify:SetMovable(false)
 		--RCnotify:EnableMouse(false)
