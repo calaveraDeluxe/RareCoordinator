@@ -132,6 +132,8 @@ function onResize(self, width, height)
 				self.mid.map[i]:SetHeight(256*scale)
 				self.mid.map[i]:SetWidth(256*scale)
 				self.mid.map[i].text:SetFont("Fonts\\ARIALN.TTF",12*scale,"OUTLINE")
+				self.mid.map[i].marker:SetHeight(10*scale)
+				self.mid.map[i].marker:SetWidth(10*scale)
 			end
 		end
 	end
@@ -467,6 +469,7 @@ local currentWaypointX = false
 local currentWaypointY = false
 local currentWaypointNPCID = false
 local Waypoints = {}
+local currentLocation = {}
 
 local needStatus = false
 
@@ -525,11 +528,17 @@ function RC:setWaypoint(id, x, y)
 			--print("SetWaypoint to "..x..","..y)
 		end
 	end
+	if id ~= nil and x ~= nil and y ~= nil then
+		currentLocation[id] = {x = x, y = y}
+	end
 end
 
 function RC:removeWaypoint(id)
 	if Waypoints[id] ~= nil then
 		TomTom:RemoveWaypoint(Waypoints[id])
+	end
+	if currentLocation[id] ~= nil and RareAlive[id] == nil then
+		currentLocation[id] = nil
 	end
 end
 
@@ -606,6 +615,13 @@ local function ShowMap(id)
 			local sorted = RC:createSortedTable()
 			RC.mid.map[id].overlay:SetTexture("Interface\\AddOns\\RareCoordinator\\imgs\\"..GetCurrentMapAreaID().."\\"..sorted[id].id..".tga")
 			RC.mid.map[id].text:SetText(RC:getLocalRareName(sorted[id].id))
+			
+			if currentLocation[sorted[id].id] then
+				RC.mid.map[id].marker:SetPoint("TOPLEFT", "RC.mid.map["..id.."]", "TOPLEFT", currentLocation[sorted[id].id].x/100*RC.mid.map[id]:GetWidth()-5, -currentLocation[sorted[id].id].y/100*RC.mid.map[id]:GetHeight()*341/512+5)
+				RC.mid.map[id].marker:Show()
+			else
+				RC.mid.map[id].marker:Hide()
+			end
 		else
 			RC.mid.map[id].overlay:SetTexture("Interface\\AddOns\\RareCoordinator\\imgs\\"..GetCurrentMapAreaID().."\\"..RareIDs[id]..".tga")
 			RC.mid.map[id].text:SetText(RC:getLocalRareName(RareIDs[id]))
@@ -921,6 +937,11 @@ for i=0, #RareIDs do
 		RC.mid.map[i].overlay = RC.mid.map[i]:CreateTexture(nil,"OVERLAY", nil, 3)
 		RC.mid.map[i].overlay:SetTexture(0.5,0,0,0.5)
 		RC.mid.map[i].overlay:SetAllPoints(RC.mid.map[i])
+		
+		RC.mid.map[i].marker = RC.mid.map[i]:CreateTexture(nil,"OVERLAY", nil, 4)
+		RC.mid.map[i].marker:SetTexture([[Interface\AddOns\RareCoordinator\marker.tga]])
+		RC.mid.map[i].marker:SetHeight(10)
+		RC.mid.map[i].marker:SetWidth(10)
 		
 		RC.mid.map[i].text = RC.mid.map[i]:CreateFontString("RC.mid.map["..i.."]", nil, "GameFontNormal")
 		RC.mid.map[i].text:SetPoint("TOP", "RC.mid.map["..i.."]", 0, 0)
