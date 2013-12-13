@@ -1250,6 +1250,25 @@ RCnotify:SetAttribute( "type", "macro" );
 
 RCnotify:Hide()
 
+local function colorize(text, color)
+	return "|cff"..color..text.."|r"
+end
+
+local function isRareDailyCompleted(rareId)
+	local questId = RareDailyQuests[rareId].daily
+	return questId > 0 and IsQuestFlaggedCompleted(questId) ~= nil
+end
+
+local function getRareNameText(rareId)
+	if rareId == 73167 then -- always emphasize houlon
+		return colorize(RC:getLocalRareName(rareId), "e86a0c")
+	elseif isRareDailyCompleted(rareId) then -- already killed today
+		return colorize(RC:getLocalRareName(rareId), "f7d358")
+	else -- not yet killed today
+		return colorize(RC:getLocalRareName(rareId), "ffffff")
+	end
+end
+
 
 local total = 0
 local function updateText(self,elapsed)
@@ -1300,11 +1319,7 @@ local function updateText(self,elapsed)
 			for k,v in pairs(sorted) do
 				if RC.left ~= nil then
 					if RC.left.text ~= nil then
-						if v.id == 73167 then
-							RC.left.text[k]:SetText("|cffe86a0c"..RC:getLocalRareName(v.id).."|r")
-						else
-							RC.left.text[k]:SetText(RC:getLocalRareName(v.id))
-						end
+						RC.left.text[k]:SetText(getRareNameText(v.id))
 					end
 					if RC.left.icon ~= nil then
 						if RareAv[v.id] ~= nil then
@@ -1358,12 +1373,7 @@ local function updateText(self,elapsed)
 			
 				if RC.left.text ~= nil then
 					for i=1,table.getn(RC.left.icon) do
-						if RareIDs[i] == 73167 then
-							RC.left.text[i]:SetText("|cffe86a0ctest"..RC:getLocalRareName(RareIDs[i]).."|r")
-						else
-							RC.left.text[i]:SetText("test "..RC:getLocalRareName(RareIDs[i]))
-						end
-						
+						RC.left.text[i]:SetText(getRareNameText(RareIDs[i]))
 					end
 				end
 					
